@@ -28,7 +28,7 @@ namespace Yuka.Tasks {
 			FileStream instream = new FileStream(sourceBasePath, FileMode.Open);
 			Archive archive = ArchiveIO.Read(instream);
 			instream.Close();
-
+			
 			if(flags.Has('p')) {
 				Console.Write("\n\nUnpacking {0}\n", Path.GetFileName(sourceBasePath));
 			}

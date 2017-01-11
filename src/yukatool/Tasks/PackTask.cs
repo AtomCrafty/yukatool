@@ -34,7 +34,7 @@ namespace Yuka.Tasks {
 				string localPath = sourcePath.Substring(sourceBasePath.Length).TrimStart('\\').ToLower();
 
 				currentFile = localPath;
-
+				
 				if(flags.Has('v')) {
 					Console.WriteLine();
 					Console.WriteLine("SourceBase: " + sourceBasePath);
