@@ -1,7 +1,7 @@
 # What is this?
-"Yuka System" is a visual novel engine used by a few companies such as HookSoft, PeasSoft or feng.  
+"Yuka System" is a visual novel engine used by a few companies such as HookSoft, Smee, PeasSoft and feng.  
 Unfortunately little to no information about the engine is publicly available so I took a few weeks to carefully analyze the game archives.  
-Why? Because we (Kachin Kachin Translations) are currently working on a fan-tl of the game "Lover Able" by Smee (HookSoft): https://forums.fuwanovel.net/topic/15293-lover-able-tl-trial-12-released/  
+Why? Because we (Kachin Kachin Translations) are currently working on a fan-tl of the game "Lover Able" by Smee: https://forums.fuwanovel.net/topic/15293-lover-able-tl-trial-12-released/  
 I've attached my notes on the file formats and some general information I've gathered in the doc/ folder.
 
 # What does it do?
