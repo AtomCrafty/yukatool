@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using Yuka.FileIO;
+using Yuka.Data;
 using Yuka.Script;
 
 namespace Yuka.Tasks {
@@ -12,6 +12,7 @@ namespace Yuka.Tasks {
 		public override void DefaultFlags(FlagCollection flags) {
 			flags.Add('v', "verbose", "Outputs additional information", false);
 			flags.Add('w', "wait", "Waits for enter before closing the console", false);
+			flags.Add('p', "progress", "Display a progress bar", false);
 		}
 
 		protected override void Execute() {
@@ -27,7 +28,12 @@ namespace Yuka.Tasks {
 			FileStream instream = new FileStream(sourceBasePath, FileMode.Open);
 			Archive archive = ArchiveIO.Read(instream);
 			instream.Close();
-			
+
+			if(flags.Has('p')) {
+				Console.Write("\n\nUnpacking {0}\n", Path.GetFileName(sourceBasePath));
+			}
+
+			double count = 0;
 			foreach(var file in archive.files) {
 				string localPath = file.Key.ToLower();
 				string targetPath = Path.Combine(targetBasePath, localPath);
@@ -35,11 +41,11 @@ namespace Yuka.Tasks {
 				currentFile = localPath;
 
 				if(flags.Has('v')) {
+					Console.WriteLine();
 					Console.WriteLine("SourceBase: " + sourceBasePath);
 					Console.WriteLine("TargetBase: " + targetBasePath);
 					Console.WriteLine("Target:     " + targetPath);
 					Console.WriteLine("Local:      " + localPath);
-					Console.WriteLine();
 				}
 
 				Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
@@ -47,6 +53,11 @@ namespace Yuka.Tasks {
 				FileStream fs = new FileStream(targetPath, FileMode.Create);
 				archive.GetInputStream(file.Key).CopyTo(fs);
 				fs.Close();
+
+				count++;
+				if(flags.Has('p')) {
+					Console.Write("\r" + TextUtils.ProgressBar(Console.WindowWidth, count / archive.files.Count));
+				}
 			}
 			currentFile = "";
 

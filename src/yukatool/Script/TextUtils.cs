@@ -121,5 +121,11 @@ namespace Yuka.Script {
 
 			return sb.ToString();
 		}
+
+		public static string ProgressBar(int width, double progress) {
+			string line = new string('=', (int)(width * progress)) + new string('.', width - (int)(width * progress));
+			string text = progress.ToString("p");
+			return line.Substring(0, (width - text.Length) / 2 - 1) + ' ' + text + ' ' + line.Substring((width + text.Length) / 2 + 2);
+		}
 	}
 }

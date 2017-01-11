@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using Yuka.FileIO;
+using Yuka.Data;
 
 namespace Yuka.Tasks {
 	class PackTask : Task {
@@ -36,11 +36,11 @@ namespace Yuka.Tasks {
 				currentFile = localPath;
 
 				if(flags.Has('v')) {
+					Console.WriteLine();
 					Console.WriteLine("SourceBase: " + sourceBasePath);
 					Console.WriteLine("TargetBase: " + targetBasePath);
 					Console.WriteLine("Source:     " + sourcePath);
 					Console.WriteLine("Local:      " + localPath);
-					Console.WriteLine();
 				}
 
 				FileStream fs = new FileStream(sourcePath, FileMode.Open);
