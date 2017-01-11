@@ -44,7 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="File\Archive.cs" />
+    <Compile Include="FileIO\Archive.cs" />
     <Compile Include="FlagCollection.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -57,11 +57,12 @@
     <Compile Include="Script\ScriptInstance.cs" />
     <Compile Include="Script\TextUtils.cs" />
     <Compile Include="Task.cs" />
-    <Compile Include="File\ArchiveIO.cs" />
+    <Compile Include="FileIO\ArchiveIO.cs" />
     <Compile Include="Tasks\CompileTask.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="Tasks\DecompileTask.cs" />
     <Compile Include="Tasks\HelpTask.cs" />
+    <Compile Include="Tasks\UnpackTask.cs" />
     <Compile Include="Tasks\PackTask.cs" />
     <Compile Include="Tasks\SplitTask.cs" />
   </ItemGroup>

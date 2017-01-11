@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using Yuka.File;
+using Yuka.FileIO;
 
 namespace Yuka.Tasks {
 	class PackTask : Task {

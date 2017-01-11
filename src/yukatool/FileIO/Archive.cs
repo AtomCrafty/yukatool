@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-namespace Yuka.File {
+namespace Yuka.FileIO {
 	class Archive {
 		public Dictionary<string, MemoryStream> files;
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Yuka.File {
+namespace Yuka.FileIO {
 	class ArchiveIO {
 		public static Archive Read(Stream s) {
 			BinaryReader br = new BinaryReader(s);

@@ -11,7 +11,8 @@ namespace Yuka {
 			Task.Register("decompile", new DecompileTask());
 			Task.Register("compile", new CompileTask());
 			Task.Register("pack", new PackTask());
-			
+			Task.Register("unpack", new UnpackTask());
+
 			Task.SetDefault("help");
 		}
 
@@ -24,6 +25,7 @@ namespace Yuka {
 				Console.ForegroundColor = ConsoleColor.Red;
 				Console.WriteLine(e.Message);
 				Console.ResetColor();
+				Console.ReadLine();
 			}
 		}
 
