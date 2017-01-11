@@ -1,0 +1,113 @@
+All of the following information has been gathered by studying the binary game files.
+AtomCrafty, Jan 11, 2017
+
+YukaContainer	(ykc)
+- Header
+	- Magic "YKC001\0\0"			59 4b 43 30 30 31 00 00
+	- Header length					18 00 00 00
+	- Unknown						00 00 00 00
+	- Index offset					?? ?? ?? ??
+	- Index length					?? ?? ?? ??
+- Index (can be positioned anywhere in the file, but is most commonly found at the end)
+	Consists of consecutive entries, each 20 bytes long (entrycount = indexlength / 20)
+	Each entry is structured as follows:
+	- Name offset					?? ?? ?? ??					points to a zero-terminated string
+	- Name length					?? ?? ?? ??					length of the string (including trailing zero byte)
+	- Data offset					?? ?? ?? ??					points to the beginning of the data block
+	- Data length					?? ?? ?? ??					length of the data block
+	- Unknown						00 00 00 00
+
+YukaGraphics	(ykg)
+- Header
+	- Magic "YKG000\0\0"			59 4b 47 30 30 30 00 00
+	- Header length					40 00 00 00
+	- Unknown						00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+	- Color data offset				?? ?? ?? ??					points to the beginning of a pixel data block
+	- Color data length				?? ?? ?? ??					length of the pixel data block
+	- Alpha data offset				?? ?? ?? ??					points to the beginning of a pixel data block
+	- Alpha data length				?? ?? ?? ??					length of the pixel data block
+	- Metadata offset				?? ?? ?? ??					points to the beginning of a metadata block
+	- Metadata length				?? ?? ?? ??					length of the metadata block
+	Each of the offset/length pairs may be 0 to indicate the absence of such data
+- Pixel data
+	- Raw png pixel data with the second and fourth byte swapped (png header becomes 89 47 4E 50 0D 0A 1A 0A)
+- Metadata
+	Information about images containing multiple frames (for example multiple button states or animations)
+	- Todo
+
+YukaScript		(yks)
+- Header
+	- Magic "YKS001\u0001\0"		59 4B 53 30 30 31 01 00
+	- Header length					30 00 00 00
+	- Unknown						00 00 00 00
+	- Code sector offset			?? ?? ?? ??					points to the beginning of the code sector (usually the same as the header length)
+	- Instruction count				?? ?? ?? ??					number of code instructions; each instruction is 4 bytes long
+	- Index offset					?? ?? ?? ??					points to the beginning of the index sector
+	- Index entry count				?? ?? ?? ??					number of index entries; each entry is 16 bytes long
+	- Data offset					?? ?? ?? ??					points to the beginning of the data sector
+	- Data length					?? ?? ?? ??					length of the data block in bytes
+	- Var pool size					?? ?? ?? ??					the number of temporary variables to be allocated for this script
+	- Unknown						00 00 00 00
+- Code
+	The code sector contains a list of instructions
+	Apart from one exception, each instruction is a 4 byte ID
+	This ID has to be looked up in the script index (at offset "indexoffset + 16 * ID")
+	If the ID refers to a function call, the next
+- Index
+	The script index acts as a lookup table for data elements and code instructions
+	Each entry consists of 4 32 bit integers, the first of which denotes the data type
+	The following data types are available:
+	- Function call
+		- This is the most common type of instruction
+		- Structure
+			- Type				00 00 00 00					yukatool: DataElement.TYPE_FUNC
+			- Name offset		?? ?? ?? ??					offset of the method name within the data sector
+			- Last instruction	?? ?? ?? ??					the last code offset this function is used at
+			- Unused			00 00 00 00
+	- Flow control element
+		- The Yuka scripting system uses these for jump labels as well as flow control symbols such as '{', '}' and 'else'
+		- Structure
+			- Type				01 00 00 00					yukatool: DataElement.TYPE_CTRL
+			- Name offset		?? ?? ?? ??					offset of the element name within the data sector
+			- Last instruction	?? ?? ?? ??					offset of the "jump offset" value within the data sector
+			- Unknown			FF FF FF FF
+	- Integer constant
+		- 32 bit signed integer constant, used as a value and in special occasions as some sort of flag pointer (more on that later)
+		- Structure
+			- Type				04 00 00 00					yukatool: DataElement.TYPE_CINT
+			- Unused			00 00 00 00
+			- Value offset		?? ?? ?? ??					offset of the integer value within the data sector
+			- Unused			00 00 00 00
+	- String constant
+		- Zero-terminated, shift-jis encoded string constant
+		- Structure
+			- Type				05 00 00 00					yukatool: DataElement.TYPE_CSTR
+			- Unused			00 00 00 00
+			- Value offset		?? ?? ?? ??					offset of the string data within the data sector
+			- Unused			00 00 00 00
+	- Integer variable reference
+		- Reference to the local or global integer variable pool; global pool is written to disk if you save the game flagtype can be a string containing either "Flag" or "GlobalFlag"
+		- Structure
+			- Type				08 00 00 00					yukatool: DataElement.TYPE_VINT
+			- Flagtype offset	?? ?? ?? ??					offset of the flag type string within the data sector
+			- Unused			00 00 00 00
+			- ID offset			?? ?? ?? ??					offset of the flag ID within the data sector
+	- String variable reference
+		- Reference to the local or global string variable pool; global pool is written to disk if you save the game; flagtype can be a string containing either "Flag" or "GlobalFlag"
+		- Structure
+			- Type				09 00 00 00					yukatool: DataElement.TYPE_VSTR
+			- Flagtype offset	?? ?? ?? ??					offset of the flag type string within the data sector
+			- Unused			00 00 00 00
+			- ID offset			?? ?? ?? ??					offset of the flag ID within the data sector
+	- Temporary variable element
+		- Temporary variable, used for nested expressions or if one function receives multiple non-trivial arguments
+		- Structure
+			- Type				0A 00 00 00					yukatool: DataElement.TYPE_VTMP
+			- Unused			00 00 00 00
+			- ID				?? ?? ?? ??					numeric ID of this variable
+			- Unused			00 00 00 00
+- Data
+	The whole data block is XOR encrypted with key 0xAA, meaning that every second bit (starting from the first one) is flipped
+	Strings are terminated with a zero byte (actually 0xAA, because it is encrypted)
+	String use the Shift-JIS character encoding
+	All integers use Big Endian byte ordering
