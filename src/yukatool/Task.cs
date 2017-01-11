@@ -17,11 +17,6 @@ namespace Yuka {
 		public FlagCollection flags;
 		public string[] arguments;
 
-		public Task() {
-			this.flags = flags;
-			this.arguments = arguments;
-		}
-
 		public void Run() {
 			FlagCollection parentFlags = FlagCollection.current;
 			FlagCollection.current = flags;
