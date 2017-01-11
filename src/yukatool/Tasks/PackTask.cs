@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
-using yuka.File;
+using Yuka.File;
 
-namespace yuka.Tasks {
+namespace Yuka.Tasks {
 	class PackTask : Task {
 		public override Task NewTask() {
 			return new PackTask();

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-namespace yuka.Script {
+namespace Yuka.Script {
 	class DataManager {
 		Dictionary<int, byte[]> dataTable = new Dictionary<int, byte[]>();
 		public int offset = 0;

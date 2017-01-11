@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using yuka.Tasks;
+using Yuka.Tasks;
 
-namespace yuka {
+namespace Yuka {
 	class Program {
 
 		static void Setup() {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace yuka.Script {
+namespace Yuka.Script {
 	abstract class DataElement {
 		public int type;
 

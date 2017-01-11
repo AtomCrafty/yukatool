@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace yuka.Script {
+namespace Yuka.Script {
 	class Constants {
 		public const string compiledScriptExtension = "yks";
 		public const string decompiledScriptExtension = "ykd";

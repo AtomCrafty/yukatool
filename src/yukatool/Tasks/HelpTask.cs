@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace yuka.Tasks {
+namespace Yuka.Tasks {
 	class HelpTask : Task {
 		public override Task NewTask() {
 			return new HelpTask();

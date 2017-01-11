@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace yuka.Tasks {
+namespace Yuka.Tasks {
 	class SplitTask : Task {
 		public override Task NewTask() {
 			return new SplitTask();

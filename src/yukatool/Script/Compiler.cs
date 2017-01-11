@@ -5,7 +5,7 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace yuka.Script {
+namespace Yuka.Script {
 	class Compiler {
 		Dictionary<string, string> stringTable = new Dictionary<string, string>();
 

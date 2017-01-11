@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
-using yuka.Script;
+using Yuka.Script;
 
-namespace yuka.Tasks {
+namespace Yuka.Tasks {
 	class DecompileTask : Task {
 		public override Task NewTask() {
 			return new DecompileTask();

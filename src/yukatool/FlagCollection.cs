@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace yuka {
+namespace Yuka {
 	public class FlagCollection {
 		public static FlagCollection current;
 

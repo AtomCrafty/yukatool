@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 
-namespace yuka.Script {
+namespace Yuka.Script {
 	class TextUtils {
 		const int defaultLineWidth = 50;
 		const string doubleWidthChars = "～♪";

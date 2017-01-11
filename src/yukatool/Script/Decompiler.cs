@@ -4,7 +4,7 @@ using System.Text;
 using System.IO;
 using System.Linq;
 
-namespace yuka.Script {
+namespace Yuka.Script {
 	class Decompiler {
 		int codeoffset, codecount, indexoffset, indexcount, dataoffset, datalength;
 		Dictionary<string, string> stringTable = new Dictionary<string, string>();

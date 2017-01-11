@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 
-namespace yuka.Script {
+namespace Yuka.Script {
 	class ScriptInstance {
 		public List<ScriptElement> commands;
 		public Dictionary<string, string> stringTable;

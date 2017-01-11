@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace yuka {
+namespace Yuka {
 	abstract class Task {
 		public static Task currentTask;
 		public static Task defaultTask;

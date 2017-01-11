@@ -7,7 +7,7 @@
     <ProjectGuid>{B55435A3-81D5-4135-B219-EC40AF4B6AD8}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>yuka</RootNamespace>
+    <RootNamespace>Yuka</RootNamespace>
     <AssemblyName>yuka</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
