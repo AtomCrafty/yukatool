@@ -10,23 +10,23 @@ namespace Yuka.Data {
 			Dictionary<string, MemoryStream> files = new Dictionary<string, MemoryStream>();
 
 			s.Seek(0x08, SeekOrigin.Begin);
-			int headerlength = br.ReadInt32();
+			uint headerlength = br.ReadUInt32();
 			s.Seek(0x04, SeekOrigin.Current);
-			int indexoffset = br.ReadInt32();
-			int indexlength = br.ReadInt32();
+			uint indexoffset = br.ReadUInt32();
+			uint indexlength = br.ReadUInt32();
 
 			for(int i = 0; i < indexlength / 0x14; i++) {
-				int curoffset = indexoffset + i * 0x14;
+				uint curoffset = (uint)(indexoffset + i * 0x14);
 				s.Seek(curoffset, SeekOrigin.Begin);
-				int nameoffset = br.ReadInt32();
-				int namelength = br.ReadInt32();
-				int dataoffset = br.ReadInt32();
-				int datalength = br.ReadInt32();
+				uint nameoffset = br.ReadUInt32();
+				uint namelength = br.ReadUInt32();
+				uint dataoffset = br.ReadUInt32();
+				uint datalength = br.ReadUInt32();
 
 				s.Seek(nameoffset, SeekOrigin.Begin);
-				string name = Encoding.ASCII.GetString(br.ReadBytes(namelength - 1));
+				string name = Encoding.ASCII.GetString(br.ReadBytes((int)namelength - 1));
 				s.Seek(dataoffset, SeekOrigin.Begin);
-				byte[] data = br.ReadBytes(datalength);
+				byte[] data = br.ReadBytes((int)datalength);
 
 				files[name] = new MemoryStream(data);
 			}
@@ -38,33 +38,33 @@ namespace Yuka.Data {
 			BinaryWriter bw = new BinaryWriter(s);
 
 			s.Write(Encoding.ASCII.GetBytes("YKC001\0\0"), 0x00, 0x08);
-			bw.Write((int)0x18);
+			bw.Write((uint)0x18);
 			s.Write(new byte[0x0C], 0x00, 0x0C);
 
 			// dataoffset, datalength, nameoffset, namelength
-			Dictionary<string, int[]> offsets = new Dictionary<string, int[]>();
+			Dictionary<string, uint[]> offsets = new Dictionary<string, uint[]>();
 
 			// Write data sector
 			foreach(var file in archive.files) {
-				int dataoffset = (int)s.Position;
+				uint dataoffset = (uint)s.Position;
 				if(FlagCollection.current.Has('v')) {
 					Console.WriteLine("Packing file: " + file.Key);
 				}
 				MemoryStream ms = archive.GetInputStream(file.Key);
 				ms.CopyTo(s);
 				//s.Write(data, 0, data.Length);
-				offsets[file.Key] = (new int[] { dataoffset, (int)file.Value.Length, -1, file.Key.Length + 1 });
+				offsets[file.Key] = (new uint[] { dataoffset, (uint)file.Value.Length, 0, (uint)file.Key.Length + 1 });
 			}
 
 			// Write name table
 			foreach(var entry in offsets) {
-				int nameoffset = (int)s.Position;
+				uint nameoffset = (uint)s.Position;
 				s.Write(Encoding.ASCII.GetBytes(entry.Key), 0, Encoding.ASCII.GetByteCount(entry.Key));
 				s.WriteByte(0);
 				entry.Value[2] = nameoffset;
 			}
 
-			int indexoffset = (int)s.Position;
+			uint indexoffset = (uint)s.Position;
 
 			// Write index
 			foreach(var entry in offsets) {
@@ -72,11 +72,11 @@ namespace Yuka.Data {
 				bw.Write(entry.Value[3]);
 				bw.Write(entry.Value[0]);
 				bw.Write(entry.Value[1]);
-				bw.Write((int)0x00);
+				bw.Write((uint)0x00);
 			}
 
 			// Update header
-			int indexlength = (int)s.Position - indexoffset;
+			uint indexlength = (uint)(s.Position - indexoffset);
 			bw.Seek(0x10, SeekOrigin.Begin);
 			bw.Write(indexoffset);
 			bw.Write(indexlength);

@@ -1,0 +1,34 @@
+
+MouseCase2(
+	$enabled,
+	$area_x1,
+	$area_y1,
+	$area_x2,
+	$area_y2,
+	$target_layer,
+	$source_layer,
+	$sprite_x,
+	$sprite_y,
+	$unknown1,
+	$hover_sprite,
+	$unknown2,
+	$hover_sound,
+	$click_sound,
+	$unknown3
+)
+
+SpriteCreate(
+	$target_layer,
+	$sub_layer,
+	$target_x,
+	$target_y,
+	$source_layer,
+	$sprite_id
+)
+
+GraphicLoadHide(
+	$target_layer,
+	$filename,
+	$unknown1,
+	$unknown2
+)

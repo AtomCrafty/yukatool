@@ -20,6 +20,7 @@ namespace Yuka {
 			try {
 				Task task = Task.Create(args);
 				task.Run();
+				//*
 			}
 			catch(Exception e) {
 				Console.ForegroundColor = ConsoleColor.Red;
@@ -27,6 +28,7 @@ namespace Yuka {
 				Console.ResetColor();
 				Console.ReadLine();
 			}
+			//*/
 		}
 
 		static void Main(string[] args) {
