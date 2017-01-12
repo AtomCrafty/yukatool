@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Yuka.Tasks;
+﻿using Yuka.Tasks;
 
 namespace Yuka {
 	class Program {
@@ -17,10 +15,12 @@ namespace Yuka {
 		}
 
 		static void Run(string[] args) {
+#if !DEBUG
 			try {
-				Task task = Task.Create(args);
-				task.Run();
-				//*
+#endif
+			Task task = Task.Create(args);
+			task.Run();
+#if !DEBUG
 			}
 			catch(Exception e) {
 				Console.ForegroundColor = ConsoleColor.Red;
@@ -28,7 +28,7 @@ namespace Yuka {
 				Console.ResetColor();
 				Console.ReadLine();
 			}
-			//*/
+#endif
 		}
 
 		static void Main(string[] args) {
