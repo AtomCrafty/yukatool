@@ -80,7 +80,12 @@ namespace Yuka.Script {
 				}
 			}
 			if(ops.Count != elements.Count - 1) {
-				throw new Exception("Operator / parameter count incompatible");
+				if(FlagCollection.current.Has("strict")) {
+					throw new Exception("Operator / parameter count incompatible");
+				}
+				else {
+					Console.Error.WriteLine("Warning: incompatible operator / parameter count in " + Task.currentTask.currentFile);
+				}
 			}
 			this.operators = ops.ToArray();
 			this.parameters = elements.ToArray();
@@ -89,7 +94,10 @@ namespace Yuka.Script {
 		public override string ToString() {
 			StringBuilder sb = new StringBuilder().Append('(').Append(parameters[0].ToString());
 			for(int i = 1; i < parameters.Length; i++) {
-				sb.Append(' ').Append(operators[i - 1]).Append(' ').Append(parameters[i]);
+				if(i <= operators.Length) {
+					sb.Append(' ').Append(operators[i - 1]);
+				}
+				sb.Append(' ').Append(parameters[i]);
 			}
 			return sb.Append(')').ToString();
 		}
