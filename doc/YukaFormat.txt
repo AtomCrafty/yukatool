@@ -111,3 +111,4 @@ YukaScript		(yks)
 	Strings are terminated with a zero byte (actually 0xAA, because it is encrypted)
 	String use the Shift-JIS character encoding
 	All integers use Big Endian byte ordering
+	
