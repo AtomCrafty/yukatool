@@ -1,34 +1,30 @@
-﻿using System.IO;
+﻿using System;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using static Yuka.Constants;
 
 namespace Yuka.Data {
 	class GraphicsIO {
 		public static YukaGraphics FromSource(string filename) {
-			byte[] colorData = null, alphaData = null, metaData = null;
+			byte[] metaData = null;
 
-			if(File.Exists(Path.ChangeExtension(filename, "layer0.png"))) {
-				colorData = File.ReadAllBytes(Path.ChangeExtension(filename, "layer0.png"));
-			}
-			if(File.Exists(Path.ChangeExtension(filename, "layer1.png"))) {
-				alphaData = File.ReadAllBytes(Path.ChangeExtension(filename, "layer1.png"));
-			}
+			Bitmap bitmap = new Bitmap(filename);
+
 			if(File.Exists(Path.ChangeExtension(filename, "meta"))) {
 				metaData = File.ReadAllBytes(Path.ChangeExtension(filename, "meta"));
 			}
 
-			return new YukaGraphics(colorData, alphaData, metaData);
+			return new YukaGraphics(bitmap, metaData);
 		}
 
 		public static void ToSource(YukaGraphics graphics, string filename) {
 			Directory.CreateDirectory(Path.GetDirectoryName(filename));
 
-			if(graphics.colorData != null) {
-				File.WriteAllBytes(Path.ChangeExtension(filename, "layer0.png"), graphics.colorData);
-			}
-			if(graphics.alphaData != null) {
-				File.WriteAllBytes(Path.ChangeExtension(filename, "layer0.png"), graphics.alphaData);
-			}
+			graphics.bitmap.Save(filename);
+
 			if(graphics.metaData != null) {
 				File.WriteAllBytes(Path.ChangeExtension(filename, "meta"), graphics.metaData);
 			}
@@ -37,7 +33,7 @@ namespace Yuka.Data {
 		public static YukaGraphics FromBinary(Stream s) {
 			byte[] colorData = null, alphaData = null, metaData = null;
 			long offset = s.Position;
-			
+
 			BinaryReader br = new BinaryReader(s, Encoding.ASCII, true /* don't close the stream! */);
 			s.Seek(0x28, SeekOrigin.Current);
 			int coloroffset = br.ReadInt32();
@@ -54,6 +50,9 @@ namespace Yuka.Data {
 				colorData[1] = (byte)'P';
 				colorData[3] = (byte)'G';
 			}
+			else {
+				throw new Exception("No color layer found");
+			}
 			if(alphaoffset != 0) {
 				s.Seek(offset + alphaoffset, SeekOrigin.Begin);
 				alphaData = br.ReadBytes(alphalength);
@@ -67,32 +66,60 @@ namespace Yuka.Data {
 			}
 
 			br.Close();
-			return new YukaGraphics(colorData, alphaData, metaData);
+
+			Bitmap colorLayer = (Image.FromStream(new MemoryStream(colorData)) as Bitmap);
+			if(alphaData != null) {
+				Bitmap alphaLayer = Image.FromStream(new MemoryStream(alphaData)) as Bitmap;
+
+				Rectangle rect = new Rectangle(0, 0, colorLayer.Width, colorLayer.Height);
+
+				colorLayer = colorLayer.Clone(rect, PixelFormat.Format32bppArgb);
+
+				BitmapData colorBits = colorLayer.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+				BitmapData alphaBits = alphaLayer.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+
+				int colorBytes = Math.Abs(colorBits.Stride) * colorLayer.Height;
+				int alphaBytes = Math.Abs(alphaBits.Stride) * alphaLayer.Height;
+
+				byte[] colorValues = new byte[colorBytes];
+				byte[] alphaValues = new byte[alphaBytes];
+
+				Marshal.Copy(colorBits.Scan0, colorValues, 0, colorBytes);
+				Marshal.Copy(alphaBits.Scan0, alphaValues, 0, alphaBytes);
+
+				for(int counter = 0; counter < colorValues.Length; counter += 4) {
+					// set the alpha channel of colorValue to the inverted red channel of alphaValues
+					colorValues[counter + 3] = (byte)(255 - alphaValues[counter]);
+				}
+
+				Marshal.Copy(colorValues, 0, colorBits.Scan0, colorBytes);
+				// Marshal.Copy(alphaValues, 0, colorBits.Scan0, alphaBytes);
+
+				colorLayer.UnlockBits(colorBits);
+				//alphaLayer.UnlockBits(alphaBits);
+			}
+
+			return new YukaGraphics(colorLayer, metaData);
 		}
 
 		public static int ToBinary(YukaGraphics graphics, Stream s) {
 			long offset = s.Position;
-			BinaryWriter bw = new BinaryWriter(s, Encoding.ASCII, true /* don't close the stream! */);
+			BinaryWriter bw = new BinaryWriter(s, Encoding.ASCII, true);
 			bw.Write(YKG_HEADER);
 
 			int curoffset = YKG_HEADER.Length;
 
-			if(graphics.colorData != null) {
-				bw.Write(curoffset);
-				bw.Write(graphics.colorData.Length);
-				curoffset += graphics.colorData.Length;
-			}
-			else {
-				bw.Write((long)0);
-			}
-			if(graphics.alphaData != null) {
-				bw.Write(curoffset);
-				bw.Write(graphics.alphaData.Length);
-				curoffset += graphics.alphaData.Length;
-			}
-			else {
-				bw.Write((long)0);
-			}
+			MemoryStream ms = new MemoryStream();
+			graphics.bitmap.Save(ms, ImageFormat.Png);
+
+			bw.Write(curoffset);
+			bw.Write(ms.Length);
+
+			curoffset += (int)ms.Length;
+
+			// no alpha channel
+			bw.Write((long)0);
+
 			if(graphics.metaData != null) {
 				bw.Write(curoffset);
 				bw.Write(graphics.metaData.Length);
@@ -101,12 +128,9 @@ namespace Yuka.Data {
 				bw.Write((long)0);
 			}
 
-			if(graphics.colorData != null) {
-				bw.Write(graphics.colorData);
-			}
-			if(graphics.alphaData != null) {
-				bw.Write(graphics.alphaData);
-			}
+			ms.WriteTo(s);
+			ms.Close();
+
 			if(graphics.metaData != null) {
 				bw.Write(graphics.metaData);
 			}
