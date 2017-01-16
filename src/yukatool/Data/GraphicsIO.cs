@@ -51,6 +51,9 @@ namespace Yuka.Data {
 				colorData[3] = (byte)'G';
 			}
 			else {
+				if(FlagCollection.current.Has('v')) {
+					Console.WriteLine("Warning: missing color layer");
+				}
 				// throw new Exception("No color layer found");
 			}
 			if(alphaoffset != 0) {
@@ -108,8 +111,8 @@ namespace Yuka.Data {
 			bw.Write(YKG_HEADER);
 
 			Bitmap colorLayer = graphics.bitmap;
-			Bitmap alphaLayer = null;
 			/*
+			Bitmap alphaLayer = null;
 			if(graphics.bitmap.PixelFormat == PixelFormat.Format32bppArgb) {
 				alphaLayer = new Bitmap(colorLayer.Width, colorLayer.Height, PixelFormat.Format24bppRgb);
 
@@ -145,7 +148,7 @@ namespace Yuka.Data {
 			}
 			*/
 			MemoryStream colorStream = new MemoryStream();
-			MemoryStream alphaStream = new MemoryStream();
+			//MemoryStream alphaStream = new MemoryStream();
 
 			colorLayer.Save(colorStream, ImageFormat.Png);
 
@@ -155,7 +158,7 @@ namespace Yuka.Data {
 			bw.Write((int)colorStream.Length);
 
 			curoffset += (int)colorStream.Length;
-
+			/*
 			if(alphaLayer != null) {
 				alphaLayer.Save(alphaStream, ImageFormat.Png);
 				bw.Write(curoffset);
@@ -165,7 +168,7 @@ namespace Yuka.Data {
 			else {
 				bw.Write((long)0);
 			}
-
+			*/
 			if(graphics.metaData != null) {
 				bw.Write(curoffset);
 				bw.Write(graphics.metaData.Length);
@@ -176,12 +179,12 @@ namespace Yuka.Data {
 
 			colorStream.WriteTo(s);
 			colorStream.Close();
-
+			/*
 			if(alphaLayer != null) {
 				alphaStream.WriteTo(s);
 			}
 			alphaStream.Close();
-
+			*/
 			if(graphics.metaData != null) {
 				bw.Write(graphics.metaData);
 			}
