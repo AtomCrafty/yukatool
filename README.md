@@ -13,9 +13,9 @@ At this point, the following operations (tasks) are supported:
 * `split` Splits a binary yuka script (.yks) into it's main sectors (code, index, data) and generates a comprehensible breakdown of the former two.
 * `decompile` Decompiles a binary yuka script into a yuka source file (.ykd) and an optional string table (.csv). Works on entire directory trees
 * `compile` Compiles a yuka source file (.ykd) and an optional string table (.csv) into a binary yuka script (.yks). Works on entire directory trees
+* `unwrap` Convert a yuka graphics file (.ykg) to png and optional meta information (.meta)
 
 The following tasks are planned for future versions:
-* `unwrap` Convert a yuka graphics file (.ykg) to png and optional meta information (.meta)
 * `wrap` Convert a png file and optional meta information (.meta) to a yuka graphics file (.ykg)
 * `disassemble` Unpack a yuka archive and automatically decompile all scripts / unwrap all graphics
 * `assemble` Pack a directory tree into a yuka archive and automatically compile all scripts / wrap all graphics
