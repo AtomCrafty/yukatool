@@ -29,6 +29,6 @@ SpriteCreate(
 GraphicLoadHide(
 	$target_layer,
 	$filename,
-	$unknown1,
-	$unknown2
+	$target_x,
+	$target_y
 )
