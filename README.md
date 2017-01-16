@@ -8,6 +8,7 @@ I've attached my notes on the file formats and some general information I've gat
 Yukatool aims to be the all in one solution for everything neccessary to properly work with the engine.  
 This includes features to deal with the three main components: archives, graphics and scripts.  
 At this point, the following operations (tasks) are supported:
+* `help` Displays a list of available commands
 * `unpack` Unpacks a yuka archive (.ykc) to a directory tree
 * `pack` Packs a directory tree into a yuka archive (.ykc)
 * `split` Splits a binary yuka script (.yks) into it's main sectors (code, index, data) and generates a comprehensible breakdown of the former two.
