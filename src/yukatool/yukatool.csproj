@@ -71,6 +71,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -80,11 +81,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\Archive.cs" />
+    <Compile Include="Data\GraphicsIO.cs" />
+    <Compile Include="Data\YukaGraphics.cs" />
     <Compile Include="FlagCollection.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Script\Compiler.cs" />
-    <Compile Include="Script\Constants.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="Script\DataElement.cs" />
     <Compile Include="Script\DataManager.cs" />
     <Compile Include="Script\Decompiler.cs" />
@@ -97,6 +100,7 @@
     <Compile Include="Helpers.cs" />
     <Compile Include="Tasks\DecompileTask.cs" />
     <Compile Include="Tasks\HelpTask.cs" />
+    <Compile Include="Tasks\UnwrapTask.cs" />
     <Compile Include="Tasks\UnpackTask.cs" />
     <Compile Include="Tasks\PackTask.cs" />
     <Compile Include="Tasks\SplitTask.cs" />

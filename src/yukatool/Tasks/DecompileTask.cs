@@ -23,7 +23,7 @@ namespace Yuka.Tasks {
 			if(Directory.Exists(sourceBasePath)) {
 				files = Directory.GetFiles(sourceBasePath, "*." + Constants.compiledScriptExtension, SearchOption.AllDirectories);
 			}
-			else if(System.IO.File.Exists(sourceBasePath)) {
+			else if(File.Exists(sourceBasePath)) {
 				files = new string[] { sourceBasePath };
 				sourceBasePath = targetBasePath = "";
 			}

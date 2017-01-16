@@ -56,7 +56,7 @@ namespace Yuka {
 
 				// Task name
 				else if(task == null) {
-					task = registeredTasks.ContainsKey(arg) ? registeredTasks[arg] : registeredTasks[""];
+					task = registeredTasks.ContainsKey(arg) ? registeredTasks[arg] : defaultTask;
 				}
 
 				// Task parameters
