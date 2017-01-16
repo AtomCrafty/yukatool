@@ -51,7 +51,7 @@ namespace Yuka.Data {
 				colorData[3] = (byte)'G';
 			}
 			else {
-				throw new Exception("No color layer found");
+				// throw new Exception("No color layer found");
 			}
 			if(alphaoffset != 0) {
 				s.Seek(offset + alphaoffset, SeekOrigin.Begin);
@@ -67,13 +67,13 @@ namespace Yuka.Data {
 
 			br.Close();
 
-			Bitmap colorLayer = (Image.FromStream(new MemoryStream(colorData)) as Bitmap);
+			Bitmap colorLayer = colorData != null ? (Image.FromStream(new MemoryStream(colorData)) as Bitmap) : null;
 			if(alphaData != null) {
 				Bitmap alphaLayer = Image.FromStream(new MemoryStream(alphaData)) as Bitmap;
 
-				Rectangle rect = new Rectangle(0, 0, colorLayer.Width, colorLayer.Height);
+				Rectangle rect = new Rectangle(0, 0, alphaLayer.Width, alphaLayer.Height);
 
-				colorLayer = colorLayer.Clone(rect, PixelFormat.Format32bppArgb);
+				colorLayer = colorLayer != null ? colorLayer.Clone(rect, PixelFormat.Format32bppArgb) : new Bitmap(alphaLayer.Width, alphaLayer.Height, PixelFormat.Format32bppArgb);
 
 				BitmapData colorBits = colorLayer.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
 				BitmapData alphaBits = alphaLayer.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
@@ -107,18 +107,64 @@ namespace Yuka.Data {
 			BinaryWriter bw = new BinaryWriter(s, Encoding.ASCII, true);
 			bw.Write(YKG_HEADER);
 
-			int curoffset = YKG_HEADER.Length;
+			Bitmap colorLayer = graphics.bitmap;
+			Bitmap alphaLayer = null;
+			/*
+			if(graphics.bitmap.PixelFormat == PixelFormat.Format32bppArgb) {
+				alphaLayer = new Bitmap(colorLayer.Width, colorLayer.Height, PixelFormat.Format24bppRgb);
 
-			MemoryStream ms = new MemoryStream();
-			graphics.bitmap.Save(ms, ImageFormat.Png);
+				Rectangle rect = new Rectangle(0, 0, colorLayer.Width, colorLayer.Height);
+
+				BitmapData colorBits = colorLayer.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+				BitmapData alphaBits = alphaLayer.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+
+				int colorBytes = Math.Abs(colorBits.Stride) * colorLayer.Height;
+				int alphaBytes = Math.Abs(alphaBits.Stride) * alphaLayer.Height;
+
+				byte[] colorValues = new byte[colorBytes];
+				byte[] alphaValues = new byte[alphaBytes];
+
+				Marshal.Copy(colorBits.Scan0, colorValues, 0, colorBytes);
+				Marshal.Copy(alphaBits.Scan0, alphaValues, 0, alphaBytes);
+
+				for(int counter = 0; counter * 3 < alphaValues.Length; counter++) {
+					// set the alpha channel of colorValue to the inverted red channel of alphaValues
+					byte opacity = (byte)(255 - colorValues[counter * 4 + 3]);
+					alphaValues[counter * 3 + 0] = opacity;
+					alphaValues[counter * 3 + 1] = opacity;
+					alphaValues[counter * 3 + 2] = opacity;
+				}
+
+				Marshal.Copy(colorValues, 0, colorBits.Scan0, colorBytes);
+				Marshal.Copy(alphaValues, 0, colorBits.Scan0, alphaBytes);
+
+				colorLayer.UnlockBits(colorBits);
+				alphaLayer.UnlockBits(alphaBits);
+
+				colorLayer = colorLayer.Clone(rect, PixelFormat.Format24bppRgb);
+			}
+			*/
+			MemoryStream colorStream = new MemoryStream();
+			MemoryStream alphaStream = new MemoryStream();
+
+			colorLayer.Save(colorStream, ImageFormat.Png);
+
+			int curoffset = 0x40; // header length
 
 			bw.Write(curoffset);
-			bw.Write(ms.Length);
+			bw.Write((int)colorStream.Length);
 
-			curoffset += (int)ms.Length;
+			curoffset += (int)colorStream.Length;
 
-			// no alpha channel
-			bw.Write((long)0);
+			if(alphaLayer != null) {
+				alphaLayer.Save(alphaStream, ImageFormat.Png);
+				bw.Write(curoffset);
+				bw.Write((int)alphaStream.Length);
+				curoffset += (int)alphaStream.Length;
+			}
+			else {
+				bw.Write((long)0);
+			}
 
 			if(graphics.metaData != null) {
 				bw.Write(curoffset);
@@ -128,8 +174,13 @@ namespace Yuka.Data {
 				bw.Write((long)0);
 			}
 
-			ms.WriteTo(s);
-			ms.Close();
+			colorStream.WriteTo(s);
+			colorStream.Close();
+
+			if(alphaLayer != null) {
+				alphaStream.WriteTo(s);
+			}
+			alphaStream.Close();
 
 			if(graphics.metaData != null) {
 				bw.Write(graphics.metaData);
