@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
+using System.Text;
 using static Yuka.Constants;
 
 namespace Yuka.Data {
@@ -38,8 +37,8 @@ namespace Yuka.Data {
 		public static YukaGraphics FromBinary(Stream s) {
 			byte[] colorData = null, alphaData = null, metaData = null;
 			long offset = s.Position;
-
-			BinaryReader br = new BinaryReader(s);
+			
+			BinaryReader br = new BinaryReader(s, Encoding.ASCII, true /* don't close the stream! */);
 			s.Seek(0x28, SeekOrigin.Current);
 			int coloroffset = br.ReadInt32();
 			int colorlength = br.ReadInt32();
@@ -52,15 +51,15 @@ namespace Yuka.Data {
 				s.Seek(offset + coloroffset, SeekOrigin.Begin);
 				colorData = br.ReadBytes(colorlength);
 				// PNG header hack
-				colorData[1] = (byte)'G';
-				colorData[3] = (byte)'P';
+				colorData[1] = (byte)'P';
+				colorData[3] = (byte)'G';
 			}
 			if(alphaoffset != 0) {
 				s.Seek(offset + alphaoffset, SeekOrigin.Begin);
 				alphaData = br.ReadBytes(alphalength);
 				// PNG header hack
-				alphaData[1] = (byte)'G';
-				alphaData[3] = (byte)'P';
+				alphaData[1] = (byte)'P';
+				alphaData[3] = (byte)'G';
 			}
 			if(metaoffset != 0) {
 				s.Seek(offset + metaoffset, SeekOrigin.Begin);
@@ -73,7 +72,7 @@ namespace Yuka.Data {
 
 		public static int ToBinary(YukaGraphics graphics, Stream s) {
 			long offset = s.Position;
-			BinaryWriter bw = new BinaryWriter(s);
+			BinaryWriter bw = new BinaryWriter(s, Encoding.ASCII, true /* don't close the stream! */);
 			bw.Write(YKG_HEADER);
 
 			int curoffset = YKG_HEADER.Length;
