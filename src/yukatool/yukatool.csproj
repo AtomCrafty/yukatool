@@ -82,6 +82,7 @@
   <ItemGroup>
     <Compile Include="Data\Factory\FileFactory.cs" />
     <Compile Include="Data\Factory\RawFactory.cs" />
+    <Compile Include="Data\Factory\ScriptFactory.cs" />
     <Compile Include="Data\YukaArchive.cs" />
     <Compile Include="Data\Factory\GraphicsFactory.cs" />
     <Compile Include="Data\YukaFile.cs" />
@@ -96,7 +97,7 @@
     <Compile Include="Script\DataManager.cs" />
     <Compile Include="Script\Decompiler.cs" />
     <Compile Include="Script\ScriptElement.cs" />
-    <Compile Include="Script\ScriptInstance.cs" />
+    <Compile Include="Data\YukaScript.cs" />
     <Compile Include="Script\TextUtils.cs" />
     <Compile Include="Task.cs" />
     <Compile Include="Data\Factory\ArchiveFactory.cs" />

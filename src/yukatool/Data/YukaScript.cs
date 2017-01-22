@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using Yuka.Script;
 
-namespace Yuka.Script {
-	class ScriptInstance {
+namespace Yuka.Data {
+	class YukaScript : YukaFile {
 		public List<ScriptElement> commands;
 		public Dictionary<string, string> stringTable;
 
-		public ScriptInstance(List<ScriptElement> commands, Dictionary<string, string> stringTable) {
+		public YukaScript(List<ScriptElement> commands, Dictionary<string, string> stringTable) {
 			this.commands = commands;
 			this.stringTable = stringTable;
 		}

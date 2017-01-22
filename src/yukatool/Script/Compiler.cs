@@ -4,12 +4,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using Yuka.Data;
 
 namespace Yuka.Script {
 	class Compiler {
 		Dictionary<string, string> stringTable = new Dictionary<string, string>();
 
-		public ScriptInstance FromSource(string scriptPath, string stringPath) {
+		public YukaScript FromSource(string scriptPath, string stringPath) {
 			StreamReader sr;
 			// import string table
 			if(System.IO.File.Exists(stringPath)) {
@@ -115,7 +116,7 @@ namespace Yuka.Script {
 									value = Regex.Replace(value, @"…|[…\.]{2,}", "...");
 									// add a space after ellipses that don't already have one next to them
 									value = Regex.Replace(value, @"(?! )\.\.\.(?! )", "... ");
-									
+
 
 
 
@@ -151,7 +152,7 @@ namespace Yuka.Script {
 
 			br.Close();
 
-			return new ScriptInstance(commands, stringTable);
+			return new YukaScript(commands, stringTable);
 		}
 
 		ScriptElement NextScriptElement(BinaryReader br) {
@@ -376,7 +377,8 @@ namespace Yuka.Script {
 
 		Dictionary<string, ControlDataElement> jumpLabels = new Dictionary<string, ControlDataElement>();
 
-		public void ToBinary(ScriptInstance script, Stream s) {
+		public long ToBinary(YukaScript script, Stream s) {
+			long offset = s.Position;
 
 			List<ScriptElement> flattened = new List<ScriptElement>();
 
@@ -505,6 +507,7 @@ namespace Yuka.Script {
 
 			// write data sector
 			dataManager.WriteTo(s);
+			return s.Position - offset;
 		}
 
 		int tempVarID = 0;

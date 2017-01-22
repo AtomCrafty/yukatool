@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Yuka.Data;
 using Yuka.Script;
 
 namespace Yuka.Tasks {
@@ -50,7 +51,7 @@ namespace Yuka.Tasks {
 
 				Compiler comp = new Compiler();
 
-				ScriptInstance script = comp.FromSource(sourcePath, metaPath);
+				YukaScript script = comp.FromSource(sourcePath, metaPath);
 
 				Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
 				FileStream fs = new FileStream(targetPath, FileMode.Create);

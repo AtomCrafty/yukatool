@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Yuka.Data;
 using Yuka.Script;
 
 namespace Yuka.Tasks {
@@ -50,7 +51,7 @@ namespace Yuka.Tasks {
 
 				Decompiler decomp = new Decompiler();
 				FileStream fs = new FileStream(sourcePath, FileMode.Open);
-				ScriptInstance script = decomp.FromBinary(fs);
+				YukaScript script = decomp.FromBinary(fs);
 				fs.Close();
 
 				string source = script.Source();

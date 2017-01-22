@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Linq;
+using Yuka.Data;
 
 namespace Yuka.Script {
 	class Decompiler {
@@ -17,7 +18,7 @@ namespace Yuka.Script {
 		/**
 		 * Decompiles a binary script from a stream.
 		 */
-		public ScriptInstance FromBinary(Stream s) {
+		public YukaScript FromBinary(Stream s) {
 			BinaryReader br = new BinaryReader(s);
 
 			// read header
@@ -58,7 +59,7 @@ namespace Yuka.Script {
 			}
 
 			// create new script instance from list of commands and attached string data and return it
-			return new ScriptInstance(commands, stringTable);
+			return new YukaScript(commands, stringTable);
 		}
 
 		/**

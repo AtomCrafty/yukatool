@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 namespace Yuka.Data.Factory {
 	class RawFactory : FileFactory<YukaRaw> {
+		public static readonly RawFactory Instance = new RawFactory();
+
 		public override YukaRaw FromBinary(Stream s) {
 			using(MemoryStream ms = new MemoryStream()) {
 				s.CopyTo(ms);
