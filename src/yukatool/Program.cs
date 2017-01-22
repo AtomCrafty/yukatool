@@ -1,4 +1,5 @@
-﻿using Yuka.Tasks;
+﻿using System;
+using Yuka.Tasks;
 
 namespace Yuka {
 	class Program {
@@ -8,10 +9,10 @@ namespace Yuka {
 			Task.Register("split", new SplitTask());
 			Task.Register("decompile", new DecompileTask());
 			Task.Register("compile", new CompileTask());
-			Task.Register("pack", new PackTask());
 			Task.Register("unpack", new UnpackTask());
-			Task.Register("wrap", new WrapTask());
+			Task.Register("pack", new PackTask());
 			Task.Register("unwrap", new UnwrapTask());
+			Task.Register("wrap", new WrapTask());
 
 			Task.SetDefault("help");
 		}

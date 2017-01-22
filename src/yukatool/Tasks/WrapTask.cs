@@ -48,6 +48,8 @@ namespace Yuka.Tasks {
 					Console.WriteLine("Local:      " + localPath);
 				}
 
+				Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
+
 				using(FileStream fs = new FileStream(targetPath, FileMode.Create)) {
 
 					YukaGraphics graphics = GraphicsIO.FromSource(sourcePath);

@@ -96,10 +96,10 @@ namespace Yuka.Data {
 				}
 
 				Marshal.Copy(colorValues, 0, colorBits.Scan0, colorBytes);
-				// Marshal.Copy(alphaValues, 0, colorBits.Scan0, alphaBytes);
+				Marshal.Copy(alphaValues, 0, colorBits.Scan0, alphaBytes);
 
 				colorLayer.UnlockBits(colorBits);
-				//alphaLayer.UnlockBits(alphaBits);
+				alphaLayer.UnlockBits(alphaBits);
 			}
 
 			return new YukaGraphics(colorLayer, metaData);
@@ -148,27 +148,20 @@ namespace Yuka.Data {
 			}
 			*/
 			MemoryStream colorStream = new MemoryStream();
-			//MemoryStream alphaStream = new MemoryStream();
 
 			colorLayer.Save(colorStream, ImageFormat.Png);
 
-			int curoffset = 0x40; // header length
+			// header length
+			int curoffset = 0x40;
 
 			bw.Write(curoffset);
 			bw.Write((int)colorStream.Length);
 
 			curoffset += (int)colorStream.Length;
-			/*
-			if(alphaLayer != null) {
-				alphaLayer.Save(alphaStream, ImageFormat.Png);
-				bw.Write(curoffset);
-				bw.Write((int)alphaStream.Length);
-				curoffset += (int)alphaStream.Length;
-			}
-			else {
-				bw.Write((long)0);
-			}
-			*/
+
+			// no opacity mask
+			bw.Write((long)0);
+
 			if(graphics.metaData != null) {
 				bw.Write(curoffset);
 				bw.Write(graphics.metaData.Length);
