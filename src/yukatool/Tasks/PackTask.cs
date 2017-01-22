@@ -27,14 +27,14 @@ namespace Yuka.Tasks {
 				Fail("The specified source directory does not exist");
 			}
 
-			Archive archive = new Archive();
+			YukaArchive archive = new YukaArchive();
 
 			for(int i = 0; i < files.Length; i++) {
 				string sourcePath = files[i];
 				string localPath = sourcePath.Substring(sourceBasePath.Length).TrimStart('\\').ToLower();
 
 				currentFile = localPath;
-				
+
 				if(flags.Has('v')) {
 					Console.WriteLine();
 					Console.WriteLine("SourceBase: " + sourceBasePath);
@@ -50,9 +50,7 @@ namespace Yuka.Tasks {
 			}
 			currentFile = "";
 
-			FileStream outstream = new FileStream(targetBasePath, FileMode.Create);
-			ArchiveIO.Write(archive, outstream);
-			outstream.Close();
+			ArchiveFactory.Instance.ToSource(archive, targetBasePath);
 
 			if(flags.Has('w')) {
 				Console.ReadLine();

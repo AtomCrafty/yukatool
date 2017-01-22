@@ -5,32 +5,13 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using static Yuka.Constants;
+using Yuka.Data.Factory;
 
 namespace Yuka.Data {
-	class GraphicsIO {
-		public static YukaGraphics FromSource(string filename) {
-			byte[] metaData = null;
+	class GraphicsFactory : FileFactory<YukaGraphics> {
+		public static readonly GraphicsFactory Instance = new GraphicsFactory();
 
-			Bitmap bitmap = new Bitmap(filename);
-
-			if(File.Exists(Path.ChangeExtension(filename, "meta"))) {
-				metaData = File.ReadAllBytes(Path.ChangeExtension(filename, "meta"));
-			}
-
-			return new YukaGraphics(bitmap, metaData);
-		}
-
-		public static void ToSource(YukaGraphics graphics, string filename) {
-			Directory.CreateDirectory(Path.GetDirectoryName(filename));
-
-			graphics.bitmap.Save(filename);
-
-			if(graphics.metaData != null) {
-				File.WriteAllBytes(Path.ChangeExtension(filename, "meta"), graphics.metaData);
-			}
-		}
-
-		public static YukaGraphics FromBinary(Stream s) {
+		public override YukaGraphics FromBinary(Stream s) {
 			byte[] colorData = null, alphaData = null, metaData = null;
 			long offset = s.Position;
 
@@ -105,50 +86,13 @@ namespace Yuka.Data {
 			return new YukaGraphics(colorLayer, metaData);
 		}
 
-		public static int ToBinary(YukaGraphics graphics, Stream s) {
+		public override long ToBinary(YukaGraphics graphics, Stream s) {
 			long offset = s.Position;
 			BinaryWriter bw = new BinaryWriter(s, Encoding.ASCII, true);
 			bw.Write(YKG_HEADER);
 
 			Bitmap colorLayer = graphics.bitmap;
-			/*
-			Bitmap alphaLayer = null;
-			if(graphics.bitmap.PixelFormat == PixelFormat.Format32bppArgb) {
-				alphaLayer = new Bitmap(colorLayer.Width, colorLayer.Height, PixelFormat.Format24bppRgb);
-
-				Rectangle rect = new Rectangle(0, 0, colorLayer.Width, colorLayer.Height);
-
-				BitmapData colorBits = colorLayer.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
-				BitmapData alphaBits = alphaLayer.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
-
-				int colorBytes = Math.Abs(colorBits.Stride) * colorLayer.Height;
-				int alphaBytes = Math.Abs(alphaBits.Stride) * alphaLayer.Height;
-
-				byte[] colorValues = new byte[colorBytes];
-				byte[] alphaValues = new byte[alphaBytes];
-
-				Marshal.Copy(colorBits.Scan0, colorValues, 0, colorBytes);
-				Marshal.Copy(alphaBits.Scan0, alphaValues, 0, alphaBytes);
-
-				for(int counter = 0; counter * 3 < alphaValues.Length; counter++) {
-					// set the alpha channel of colorValue to the inverted red channel of alphaValues
-					byte opacity = (byte)(255 - colorValues[counter * 4 + 3]);
-					alphaValues[counter * 3 + 0] = opacity;
-					alphaValues[counter * 3 + 1] = opacity;
-					alphaValues[counter * 3 + 2] = opacity;
-				}
-
-				Marshal.Copy(colorValues, 0, colorBits.Scan0, colorBytes);
-				Marshal.Copy(alphaValues, 0, colorBits.Scan0, alphaBytes);
-
-				colorLayer.UnlockBits(colorBits);
-				alphaLayer.UnlockBits(alphaBits);
-
-				colorLayer = colorLayer.Clone(rect, PixelFormat.Format24bppRgb);
-			}
-			*/
 			MemoryStream colorStream = new MemoryStream();
-
 			colorLayer.Save(colorStream, ImageFormat.Png);
 
 			// header length
@@ -183,7 +127,29 @@ namespace Yuka.Data {
 			}
 
 			bw.Close();
-			return (int)(s.Position - offset);
+			return s.Position - offset;
+		}
+
+		public override YukaGraphics FromSource(string filename) {
+			byte[] metaData = null;
+
+			Bitmap bitmap = new Bitmap(filename);
+
+			if(File.Exists(Path.ChangeExtension(filename, "meta"))) {
+				metaData = File.ReadAllBytes(Path.ChangeExtension(filename, "meta"));
+			}
+
+			return new YukaGraphics(bitmap, metaData);
+		}
+
+		public override void ToSource(YukaGraphics graphics, string filename) {
+			Directory.CreateDirectory(Path.GetDirectoryName(filename));
+
+			graphics.bitmap.Save(filename);
+
+			if(graphics.metaData != null) {
+				File.WriteAllBytes(Path.ChangeExtension(filename, "meta"), graphics.metaData);
+			}
 		}
 	}
 }

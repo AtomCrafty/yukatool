@@ -2,14 +2,14 @@
 using System.IO;
 
 namespace Yuka.Data {
-	class Archive {
+	class YukaArchive : YukaFile {
 		public Dictionary<string, MemoryStream> files;
 
-		public Archive() {
+		public YukaArchive() {
 			files = new Dictionary<string, MemoryStream>();
 		}
 
-		public Archive(Dictionary<string, MemoryStream> files) {
+		public YukaArchive(Dictionary<string, MemoryStream> files) {
 			this.files = files;
 		}
 

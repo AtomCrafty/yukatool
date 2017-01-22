@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using Yuka.Data;
-using Yuka.Script;
 
 namespace Yuka.Tasks {
 	class WrapTask : Task {
@@ -52,8 +51,8 @@ namespace Yuka.Tasks {
 
 				using(FileStream fs = new FileStream(targetPath, FileMode.Create)) {
 
-					YukaGraphics graphics = GraphicsIO.FromSource(sourcePath);
-					GraphicsIO.ToBinary(graphics, fs);
+					YukaGraphics graphics = GraphicsFactory.Instance.FromSource(sourcePath);
+					GraphicsFactory.Instance.ToBinary(graphics, fs);
 
 				}
 			}

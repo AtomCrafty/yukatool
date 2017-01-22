@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Yuka.Data.Factory;
 
 namespace Yuka.Data {
-	class ArchiveIO {
-		public static Archive Read(Stream s) {
+	class ArchiveFactory : FileFactory<YukaArchive> {
+		public static readonly ArchiveFactory Instance = new ArchiveFactory();
+
+		public override YukaArchive FromBinary(Stream s) {
 			BinaryReader br = new BinaryReader(s);
 			Dictionary<string, MemoryStream> files = new Dictionary<string, MemoryStream>();
 
@@ -31,10 +34,11 @@ namespace Yuka.Data {
 				files[name] = new MemoryStream(data);
 			}
 
-			return new Archive(files);
+			return new YukaArchive(files);
 		}
 
-		public static void Write(Archive archive, Stream s) {
+		public override long ToBinary(YukaArchive data, Stream s) {
+			long offset = s.Position;
 			BinaryWriter bw = new BinaryWriter(s);
 
 			s.Write(Encoding.ASCII.GetBytes("YKC001\0\0"), 0x00, 0x08);
@@ -45,12 +49,12 @@ namespace Yuka.Data {
 			Dictionary<string, uint[]> offsets = new Dictionary<string, uint[]>();
 
 			// Write data sector
-			foreach(var file in archive.files) {
+			foreach(var file in data.files) {
 				uint dataoffset = (uint)s.Position;
 				if(FlagCollection.current.Has('v')) {
 					Console.WriteLine("Packing file: " + file.Key);
 				}
-				MemoryStream ms = archive.GetInputStream(file.Key);
+				MemoryStream ms = data.GetInputStream(file.Key);
 				ms.CopyTo(s);
 				//s.Write(data, 0, data.Length);
 				offsets[file.Key] = (new uint[] { dataoffset, (uint)file.Value.Length, 0, (uint)file.Key.Length + 1 });
@@ -82,6 +86,19 @@ namespace Yuka.Data {
 			bw.Write(indexlength);
 
 			bw.Close();
+			return s.Position - offset;
+		}
+
+		public override YukaArchive FromSource(string filename) {
+			using(FileStream fs = new FileStream(filename, FileMode.Open)) {
+				return FromBinary(fs);
+			}
+		}
+
+		public override void ToSource(YukaArchive data, string filename) {
+			using(FileStream fs = new FileStream(filename, FileMode.Create)) {
+				ToBinary(data, fs);
+			}
 		}
 	}
 }

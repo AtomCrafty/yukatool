@@ -50,8 +50,8 @@ namespace Yuka.Tasks {
 
 				using(FileStream fs = new FileStream(sourcePath, FileMode.Open)) {
 
-					YukaGraphics graphics = GraphicsIO.FromBinary(fs);
-					GraphicsIO.ToSource(graphics, targetPath);
+					YukaGraphics graphics = GraphicsFactory.Instance.FromBinary(fs);
+					GraphicsFactory.Instance.ToSource(graphics, targetPath);
 
 				}
 			}

@@ -80,8 +80,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Data\Archive.cs" />
-    <Compile Include="Data\GraphicsIO.cs" />
+    <Compile Include="Data\Factory\FileFactory.cs" />
+    <Compile Include="Data\YukaArchive.cs" />
+    <Compile Include="Data\Factory\GraphicsFactory.cs" />
+    <Compile Include="Data\YukaFile.cs" />
     <Compile Include="Data\YukaGraphics.cs" />
     <Compile Include="FlagCollection.cs" />
     <Compile Include="Program.cs" />
@@ -95,7 +97,7 @@
     <Compile Include="Script\ScriptInstance.cs" />
     <Compile Include="Script\TextUtils.cs" />
     <Compile Include="Task.cs" />
-    <Compile Include="Data\ArchiveIO.cs" />
+    <Compile Include="Data\Factory\ArchiveFactory.cs" />
     <Compile Include="Tasks\CompileTask.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="Tasks\DecompileTask.cs" />

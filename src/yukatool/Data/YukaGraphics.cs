@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 
 namespace Yuka.Data {
-	class YukaGraphics {
+	class YukaGraphics : YukaFile {
 		public Bitmap bitmap;
 		public byte[] metaData;
 

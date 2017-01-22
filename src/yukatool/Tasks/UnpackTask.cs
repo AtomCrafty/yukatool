@@ -25,10 +25,8 @@ namespace Yuka.Tasks {
 				Fail("The specified source file does not exist");
 			}
 
-			FileStream instream = new FileStream(sourceBasePath, FileMode.Open);
-			Archive archive = ArchiveIO.Read(instream);
-			instream.Close();
-			
+			YukaArchive archive = ArchiveFactory.Instance.FromSource(sourceBasePath);
+
 			if(flags.Has('p')) {
 				Console.Write("\n\nUnpacking {0}\n", Path.GetFileName(sourceBasePath));
 			}
