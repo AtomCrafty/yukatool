@@ -8,17 +8,18 @@ I've attached my notes on the file formats and some general information I've gat
 Yukatool aims to be the all in one solution for everything neccessary to properly work with the engine.  
 This includes features to deal with the three main components: archives, graphics and scripts.  
 At this point, the following operations (tasks) are supported:
+* `help` Displays a list of available commands
 * `unpack` Unpacks a yuka archive (.ykc) to a directory tree
 * `pack` Packs a directory tree into a yuka archive (.ykc)
 * `split` Splits a binary yuka script (.yks) into it's main sectors (code, index, data) and generates a comprehensible breakdown of the former two.
 * `decompile` Decompiles a binary yuka script into a yuka source file (.ykd) and an optional string table (.csv). Works on entire directory trees
 * `compile` Compiles a yuka source file (.ykd) and an optional string table (.csv) into a binary yuka script (.yks). Works on entire directory trees
-* `unwrap` Convert a yuka graphics file (.ykg) to png and optional meta information (.meta)
+* `unwrap` Converts a yuka graphics file (.ykg) to png and optional meta information (.meta)
+* `wrap` Converts a png file and optional meta information (.meta) to a yuka graphics file (.ykg)
 
 The following tasks are planned for future versions:
-* `wrap` Convert a png file and optional meta information (.meta) to a yuka graphics file (.ykg)
-* `disassemble` Unpack a yuka archive and automatically decompile all scripts / unwrap all graphics
-* `assemble` Pack a directory tree into a yuka archive and automatically compile all scripts / wrap all graphics
+* `disassemble` Unpacks a yuka archive and automatically decompiles all scripts / unwraps all graphics
+* `assemble` Packs a directory tree into a yuka archive and automatically compiles all scripts / wraps all graphics
 
 # How do I use it?
 Yukatool is completely command-line operated. The basic syntax is as follows:  
