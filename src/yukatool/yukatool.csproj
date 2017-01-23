@@ -105,6 +105,7 @@
     <Compile Include="Helpers.cs" />
     <Compile Include="Tasks\DecompileTask.cs" />
     <Compile Include="Tasks\HelpTask.cs" />
+    <Compile Include="Tasks\PatchTask.cs" />
     <Compile Include="Tasks\WrapTask.cs" />
     <Compile Include="Tasks\UnwrapTask.cs" />
     <Compile Include="Tasks\UnpackTask.cs" />
