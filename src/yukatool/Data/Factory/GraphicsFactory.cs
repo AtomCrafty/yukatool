@@ -5,9 +5,8 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using static Yuka.Constants;
-using Yuka.Data.Factory;
 
-namespace Yuka.Data {
+namespace Yuka.Data.Factory {
 	class GraphicsFactory : FileFactory<YukaGraphics> {
 		public static readonly GraphicsFactory Instance = new GraphicsFactory();
 

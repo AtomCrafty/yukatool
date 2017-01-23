@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using Yuka.Data;
-using Yuka.Script;
+using Yuka.Data.Factory;
 
 namespace Yuka.Tasks {
 	class UnwrapTask : Task {

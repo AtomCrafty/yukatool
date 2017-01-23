@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Yuka.Tasks {
+namespace Yuka {
 	static class Helpers {
 		public static string AbsolutePath(string path) {
 			return Path.Combine(Directory.GetCurrentDirectory(), path);

@@ -84,7 +84,7 @@ namespace Yuka.Script {
 				row.Add(cell.ToString());
 				rows.Add(row);
 
-				int generatedColumnID = 7;
+				//int generatedColumnID = 7;
 				int maxTextColumn = 6;
 				int minTextColumn = 2;
 
