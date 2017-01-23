@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Yuka.Data;
+using Yuka.Data.Factory;
 
 namespace Yuka.Tasks {
 	class PackTask : Task {

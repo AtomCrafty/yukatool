@@ -11,6 +11,7 @@ At this point, the following operations (tasks) are supported:
 * `help` Displays a list of available commands
 * `unpack` Unpacks a yuka archive (.ykc) to a directory tree
 * `pack` Packs a directory tree into a yuka archive (.ykc)
+* `patch` Copies all files from one archive to another
 * `split` Splits a binary yuka script (.yks) into it's main sectors (code, index, data) and generates a comprehensible breakdown of the former two.
 * `decompile` Decompiles a binary yuka script into a yuka source file (.ykd) and an optional string table (.csv). Works on entire directory trees
 * `compile` Compiles a yuka source file (.ykd) and an optional string table (.csv) into a binary yuka script (.yks). Works on entire directory trees
@@ -24,7 +25,7 @@ The following tasks are planned for future versions:
 # How do I use it?
 Yukatool is completely command-line operated. The basic syntax is as follows:  
 `yuka.exe [flags] <task> <arguments...>`  
-Flags do **not** have to be at the beginning and can be sepecified in a long or short form:  
+Flags do **not** have to be at the beginning and can be specified in a long or short form:  
 `-rvw` adds the flags `--raw`, `--verbose` and `--wait`  
 Which flags are available depends on the task you want to execute.  
 

@@ -13,7 +13,7 @@ namespace Yuka.Script {
 		public YukaScript FromSource(string scriptPath, string stringPath) {
 			StreamReader sr;
 			// import string table
-			if(System.IO.File.Exists(stringPath)) {
+			if(File.Exists(stringPath)) {
 				//string stringData = File.ReadAllText(stringPath);
 				int offset = -1;
 
@@ -84,7 +84,7 @@ namespace Yuka.Script {
 				row.Add(cell.ToString());
 				rows.Add(row);
 
-				int generatedColumnID = 7;
+				//int generatedColumnID = 7;
 				int maxTextColumn = 6;
 				int minTextColumn = 2;
 

@@ -10,6 +10,7 @@ namespace Yuka {
 			Task.Register("decompile", new DecompileTask());
 			Task.Register("compile", new CompileTask());
 			Task.Register("unpack", new UnpackTask());
+			Task.Register("patch", new PatchTask());
 			Task.Register("pack", new PackTask());
 			Task.Register("unwrap", new UnwrapTask());
 			Task.Register("wrap", new WrapTask());

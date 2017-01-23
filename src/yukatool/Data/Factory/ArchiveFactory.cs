@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Yuka.Data.Factory;
 
-namespace Yuka.Data {
+namespace Yuka.Data.Factory {
 	class ArchiveFactory : FileFactory<YukaArchive> {
 		public static readonly ArchiveFactory Instance = new ArchiveFactory();
 
@@ -39,7 +38,7 @@ namespace Yuka.Data {
 
 		public override long ToBinary(YukaArchive data, Stream s) {
 			long offset = s.Position;
-			BinaryWriter bw = new BinaryWriter(s);
+			BinaryWriter bw = new BinaryWriter(s, Encoding.ASCII, true);
 
 			s.Write(Encoding.ASCII.GetBytes("YKC001\0\0"), 0x00, 0x08);
 			bw.Write((uint)0x18);
