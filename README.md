@@ -25,7 +25,7 @@ The following tasks are planned for future versions:
 # How do I use it?
 Yukatool is completely command-line operated. The basic syntax is as follows:  
 `yuka.exe [flags] <task> <arguments...>`  
-Flags do **not** have to be at the beginning and can be sepecified in a long or short form:  
+Flags do **not** have to be at the beginning and can be specified in a long or short form:  
 `-rvw` adds the flags `--raw`, `--verbose` and `--wait`  
 Which flags are available depends on the task you want to execute.  
 
