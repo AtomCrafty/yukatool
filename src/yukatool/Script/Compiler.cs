@@ -13,7 +13,7 @@ namespace Yuka.Script {
 		public YukaScript FromSource(string scriptPath, string stringPath) {
 			StreamReader sr;
 			// import string table
-			if(System.IO.File.Exists(stringPath)) {
+			if(File.Exists(stringPath)) {
 				//string stringData = File.ReadAllText(stringPath);
 				int offset = -1;
 
