@@ -55,8 +55,8 @@ namespace Yuka {
 				}
 
 				// Task name
-				else if(task == null) {
-					task = registeredTasks.ContainsKey(arg) ? registeredTasks[arg] : defaultTask;
+				else if(task == null && registeredTasks.ContainsKey(arg)) {
+					task = registeredTasks[arg];
 				}
 
 				// Task parameters
@@ -66,7 +66,7 @@ namespace Yuka {
 			}
 
 			if(task == null) {
-				task = registeredTasks[""];
+				task = defaultTask;
 			}
 
 			FlagCollection flags = new FlagCollection();
