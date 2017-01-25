@@ -102,7 +102,7 @@ namespace Yuka.Script {
 			// don't use these note characters: ♩♫♬🎝🎵
 
 			sb.Replace('（', '(');
-			sb.Replace('）', '(');
+			sb.Replace('）', ')');
 			sb.Replace('『', '"');
 			sb.Replace('』', '"');
 			sb.Replace("「", "");

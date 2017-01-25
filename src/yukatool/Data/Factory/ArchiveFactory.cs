@@ -95,6 +95,7 @@ namespace Yuka.Data.Factory {
 		}
 
 		public override void ToSource(YukaArchive data, string filename) {
+			Directory.CreateDirectory(Path.GetDirectoryName(filename));
 			using(FileStream fs = new FileStream(filename, FileMode.Create)) {
 				ToBinary(data, fs);
 			}

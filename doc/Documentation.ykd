@@ -1,4 +1,10 @@
 
+// LineFeed
+LF()
+
+// PageFeed
+PF()
+
 MouseCase2(
 	$enabled,
 	$area_x1,
