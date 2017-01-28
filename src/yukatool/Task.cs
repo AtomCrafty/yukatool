@@ -43,7 +43,19 @@ namespace Yuka {
 
 		[DebuggerStepThrough]
 		public void Log(string message) {
-			Console.WriteLine(message);
+			if(flags.Has('v')) {
+				Console.WriteLine(message);
+			}
+		}
+
+		[DebuggerStepThrough]
+		public void Log(string message, ConsoleColor color) {
+			if(flags.Has('v')) {
+				ConsoleColor old = Console.ForegroundColor;
+				Console.ForegroundColor = color;
+				Console.WriteLine(message);
+				Console.ForegroundColor = old;
+			}
 		}
 
 		public static Task Create(string[] args) {

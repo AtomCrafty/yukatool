@@ -76,15 +76,12 @@ namespace Yuka.Tasks {
 					if(!Directory.Exists(patchDirectory)) Fail("Patch directory does not exist");
 
 					// download new patch files
-					int skippedDownloads = 0;
+					int finishedDownloads = 0, skippedDownloads = 0;
 					if(fetchUrl != null && fetchUrl.Length > 2) {
 						using(WebClient web = new WebClient()) {
-							if(flags.Has('v')) {
-								Console.ForegroundColor = ConsoleColor.Yellow;
-								Console.WriteLine("Fetching patch list from " + fetchUrl);
-								Console.ResetColor();
-							}
+							Log("Fetching patch list from " + fetchUrl, ConsoleColor.Yellow);
 							string[] remoteFiles = web.DownloadString(fetchUrl).Split('\n');
+
 							foreach(string fileUri in remoteFiles) {
 								if(fileUri == "") continue;
 								string fileName = Path.GetFileName(fileUri);
@@ -93,24 +90,19 @@ namespace Yuka.Tasks {
 									skippedDownloads++;
 								}
 								else {
-									if(flags.Has('v')) {
-										Console.ForegroundColor = ConsoleColor.Yellow;
-										Console.WriteLine("Downloading " + fileName);
-										Console.ResetColor();
-									}
+									Log("Downloading " + fileName, ConsoleColor.Yellow);
 									web.DownloadFile(fileUri, filePath);
+									finishedDownloads++;
 								}
 							}
 						}
 					}
-					if(flags.Has('v') && skippedDownloads > 0) {
-						Console.ForegroundColor = ConsoleColor.Green;
-						Console.WriteLine("Skipped " + skippedDownloads + " downloads");
-						Console.ResetColor();
+					if(skippedDownloads + finishedDownloads > 0) {
+						Log("Downloaded " + finishedDownloads + " patches, skipped " + skippedDownloads, ConsoleColor.Green);
 					}
 
 					// apply patch files
-					int skippedPatches = 0;
+					int appliedPatches = 0, skippedPatches = 0;
 					string[] localFiles = Directory.GetFiles(patchDirectory, "*." + Constants.archiveExtension);
 					foreach(string filePath in localFiles) {
 						string fileName = Path.GetFileName(filePath);
@@ -130,6 +122,7 @@ namespace Yuka.Tasks {
 									}
 									found = true;
 									Patch(archivePath, filePath);
+									appliedPatches++;
 									break;
 								}
 							}
@@ -137,14 +130,12 @@ namespace Yuka.Tasks {
 								history.Add(fileName);
 							}
 							else {
-								Console.WriteLine("Could not determine target archive for patch '" + fileName + "'");
+								Log("Could not determine target archive for patch '" + fileName + "'", ConsoleColor.Red);
 							}
 						}
 					}
-					if(flags.Has('v') && skippedPatches > 0) {
-						Console.ForegroundColor = ConsoleColor.Green;
-						Console.WriteLine("Skipped " + skippedPatches + " patches");
-						Console.ResetColor();
+					if(skippedPatches + appliedPatches > 0) {
+						Log("Applied " + appliedPatches + " patches, skipped " + skippedPatches, ConsoleColor.Green);
 					}
 
 					info.history = JArray.FromObject(history.ToArray());
