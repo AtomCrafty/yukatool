@@ -81,7 +81,7 @@ namespace Yuka.Data.Factory {
 				}
 
 				Marshal.Copy(colorValues, 0, colorBits.Scan0, colorBytes);
-				Marshal.Copy(alphaValues, 0, colorBits.Scan0, alphaBytes);
+				Marshal.Copy(alphaValues, 0, alphaBits.Scan0, alphaBytes);
 
 				colorLayer.UnlockBits(colorBits);
 				alphaLayer.UnlockBits(alphaBits);
