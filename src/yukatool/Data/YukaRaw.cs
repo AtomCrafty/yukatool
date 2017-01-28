@@ -9,7 +9,7 @@ namespace Yuka.Data {
 	class YukaRaw : YukaFile {
 		public byte[] data;
 
-		public YukaRaw(byte[] data) {
+		public YukaRaw(byte[] data) : base(DataType.Raw) {
 			this.data = data;
 		}
 	}

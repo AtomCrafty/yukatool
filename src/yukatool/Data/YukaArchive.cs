@@ -5,11 +5,11 @@ namespace Yuka.Data {
 	class YukaArchive : YukaFile {
 		public Dictionary<string, MemoryStream> files;
 
-		public YukaArchive() {
+		public YukaArchive() : base(DataType.Archive) {
 			files = new Dictionary<string, MemoryStream>();
 		}
 
-		public YukaArchive(Dictionary<string, MemoryStream> files) {
+		public YukaArchive(Dictionary<string, MemoryStream> files) : base(DataType.Archive) {
 			this.files = files;
 		}
 

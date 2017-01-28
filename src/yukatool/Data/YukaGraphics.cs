@@ -5,11 +5,11 @@ namespace Yuka.Data {
 		public Bitmap bitmap;
 		public byte[] metaData;
 
-		public YukaGraphics(Bitmap bitmap) {
+		public YukaGraphics(Bitmap bitmap) : base(DataType.Graphics) {
 			this.bitmap = bitmap;
 		}
 
-		public YukaGraphics(Bitmap bitmap, byte[] metaData) {
+		public YukaGraphics(Bitmap bitmap, byte[] metaData) : base(DataType.Graphics) {
 			this.bitmap = bitmap;
 			this.metaData = metaData;
 		}

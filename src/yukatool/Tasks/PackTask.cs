@@ -9,6 +9,9 @@ namespace Yuka.Tasks {
 			return new PackTask();
 		}
 
+		public PackTask() { }
+		public PackTask(string[] arguments, FlagCollection flags) : base(arguments, flags) { }
+
 		public override void DefaultFlags(FlagCollection flags) {
 			flags.Add('v', "verbose", "Outputs additional information", false);
 			flags.Add('w', "wait", "Waits for enter before closing the console", false);

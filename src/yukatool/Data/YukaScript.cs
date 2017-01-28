@@ -7,7 +7,7 @@ namespace Yuka.Data {
 		public List<ScriptElement> commands;
 		public Dictionary<string, string> stringTable;
 
-		public YukaScript(List<ScriptElement> commands, Dictionary<string, string> stringTable) {
+		public YukaScript(List<ScriptElement> commands, Dictionary<string, string> stringTable) : base(DataType.Script) {
 			this.commands = commands;
 			this.stringTable = stringTable;
 		}
