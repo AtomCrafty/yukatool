@@ -8,18 +8,18 @@ using Yuka.Data;
 using Yuka.Data.Factory;
 
 namespace Yuka.Tasks {
-	class PatchTask : Task {
+	class DeployTask : Task {
 		public override Task NewTask() {
-			return new PatchTask();
+			return new DeployTask();
 		}
 
-		public PatchTask() { }
-		public PatchTask(string[] arguments, FlagCollection flags) : base(arguments, flags) { }
+		public DeployTask() { }
+		public DeployTask(string[] arguments, FlagCollection flags) : base(arguments, flags) { }
 
 		public override void DefaultFlags(FlagCollection flags) {
 			flags.Add('v', "verbose", "Outputs additional information", false);
 			flags.Add('w', "wait", "Waits for enter before closing the console", false);
-			flags.Add('i', "init", "Initialize a new autopatch directory", false);
+			flags.Add('i', "incremental", "Only include files that have changed. Requires a deploy", false);
 		}
 
 		protected override void Execute() {

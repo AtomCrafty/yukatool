@@ -10,6 +10,8 @@ namespace Yuka.Data.Factory {
 	class GraphicsFactory : FileFactory<YukaGraphics> {
 		public static readonly GraphicsFactory Instance = new GraphicsFactory();
 
+		public GraphicsFactory() : base(DataType.Graphics) { }
+
 		public override YukaGraphics FromBinary(Stream s) {
 			byte[] colorData = null, alphaData = null, metaData = null;
 			long offset = s.Position;
@@ -51,12 +53,15 @@ namespace Yuka.Data.Factory {
 			br.Close();
 
 			Bitmap colorLayer = colorData != null ? (Image.FromStream(new MemoryStream(colorData)) as Bitmap) : null;
+
 			if(alphaData != null) {
 				Bitmap alphaLayer = Image.FromStream(new MemoryStream(alphaData)) as Bitmap;
 
 				Rectangle rect = new Rectangle(0, 0, alphaLayer.Width, alphaLayer.Height);
 
 				colorLayer = colorLayer != null ? colorLayer.Clone(rect, PixelFormat.Format32bppArgb) : new Bitmap(alphaLayer.Width, alphaLayer.Height, PixelFormat.Format32bppArgb);
+
+				colorLayer.Save(@"S:\Games\Visual Novels\Lover Able\data02-org-raw\system_.png");
 
 				BitmapData colorBits = colorLayer.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
 				BitmapData alphaBits = alphaLayer.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);

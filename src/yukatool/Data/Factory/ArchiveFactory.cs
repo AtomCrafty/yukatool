@@ -7,6 +7,8 @@ namespace Yuka.Data.Factory {
 	class ArchiveFactory : FileFactory<YukaArchive> {
 		public static readonly ArchiveFactory Instance = new ArchiveFactory();
 
+		public ArchiveFactory() : base(DataType.Archive) { }
+
 		public override YukaArchive FromBinary(Stream s) {
 			BinaryReader br = new BinaryReader(s);
 			Dictionary<string, MemoryStream> files = new Dictionary<string, MemoryStream>();

@@ -22,7 +22,7 @@ namespace Yuka.Tasks {
 
 			string[] files = null;
 			if(Directory.Exists(sourceBasePath)) {
-				files = Directory.GetFiles(sourceBasePath, "*." + Constants.decompiledScriptExtension, SearchOption.AllDirectories);
+				files = Directory.GetFiles(sourceBasePath, "*." + Constants.ykd, SearchOption.AllDirectories);
 			}
 			else if(System.IO.File.Exists(sourceBasePath)) {
 				files = new string[] { sourceBasePath };
@@ -35,8 +35,8 @@ namespace Yuka.Tasks {
 			for(int i = 0; i < files.Length; i++) {
 				string sourcePath = files[i];
 				string localPath = sourcePath.Substring(sourceBasePath.Length).TrimStart('\\').ToLower();
-				string targetPath = Path.ChangeExtension(Path.Combine(targetBasePath, localPath), Constants.compiledScriptExtension);
-				string metaPath = Path.ChangeExtension(Path.Combine(sourceBasePath, localPath), Constants.stringMetaExtension);
+				string targetPath = Path.ChangeExtension(Path.Combine(targetBasePath, localPath), Constants.yks);
+				string metaPath = Path.ChangeExtension(Path.Combine(sourceBasePath, localPath), Constants.csv);
 
 				currentFile = localPath;
 

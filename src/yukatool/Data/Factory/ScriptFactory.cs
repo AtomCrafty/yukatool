@@ -7,12 +7,14 @@ namespace Yuka.Data.Factory {
 	class ScriptFactory : FileFactory<YukaScript> {
 		public static readonly ScriptFactory Instance = new ScriptFactory();
 
+		public ScriptFactory() : base(DataType.Script) { }
+
 		public override YukaScript FromBinary(Stream s) {
 			return new Decompiler().FromBinary(s);
 		}
 
 		public override YukaScript FromSource(string filename) {
-			return new Compiler().FromSource(filename, Path.ChangeExtension(filename, stringMetaExtension));
+			return new Compiler().FromSource(filename, Path.ChangeExtension(filename, csv));
 		}
 
 		public override long ToBinary(YukaScript data, Stream s) {
