@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Yuka {
 	abstract class Task {
@@ -17,6 +18,14 @@ namespace Yuka {
 		public FlagCollection flags;
 		public string[] arguments;
 
+		public Task() {
+		}
+
+		public Task(string[] arguments, FlagCollection flags) {
+			this.arguments = arguments;
+			this.flags = flags;
+		}
+
 		public void Run() {
 			FlagCollection parentFlags = FlagCollection.current;
 			FlagCollection.current = flags;
@@ -27,10 +36,12 @@ namespace Yuka {
 			FlagCollection.current = parentFlags;
 		}
 
+		[DebuggerStepThrough]
 		public void Fail(string message) {
 			throw new Exception(message);
 		}
 
+		[DebuggerStepThrough]
 		public void Log(string message) {
 			Console.WriteLine(message);
 		}
@@ -84,7 +95,7 @@ namespace Yuka {
 			task = task.NewTask();
 			task.flags = flags;
 			task.arguments = param.ToArray();
-			
+
 			return task;
 		}
 

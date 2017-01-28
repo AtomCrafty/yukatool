@@ -1,8 +1,11 @@
 ﻿using System;
+using System.IO;
+using System.Reflection;
 using Yuka.Tasks;
 
 namespace Yuka {
 	class Program {
+
 		static void Setup() {
 			// Register tasks
 			Task.Register("help", new HelpTask());
@@ -15,15 +18,17 @@ namespace Yuka {
 			Task.Register("unwrap", new UnwrapTask());
 			Task.Register("wrap", new WrapTask());
 
-			Task.SetDefault("help");
+			Task.Register("auto", new AutoTask());
+
+			Task.SetDefault("auto");
 		}
 
 		static void Run(string[] args) {
 #if !DEBUG
 			try {
 #endif
-			Task task = Task.Create(args);
-			task.Run();
+				Task task = Task.Create(args);
+				task.Run();
 #if !DEBUG
 			}
 			catch(Exception e) {
@@ -38,6 +43,21 @@ namespace Yuka {
 		static void Main(string[] args) {
 			Setup();
 			Run(args);
+		}
+
+		static Program() {
+			AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(Resolver);
+		}
+
+		static Assembly Resolver(object sender, ResolveEventArgs args) {
+			string resourceName = "Yuka." + args.Name.Split(',')[0] + ".dll";
+
+			Assembly ea = Assembly.GetExecutingAssembly();
+			Stream s = ea.GetManifestResourceStream(resourceName);
+			byte[] block = new byte[s.Length];
+			s.Read(block, 0, block.Length);
+			Assembly la = Assembly.Load(block);
+			return la;
 		}
 	}
 }

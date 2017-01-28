@@ -26,7 +26,7 @@ namespace Yuka.Data.Factory {
 				uint datalength = br.ReadUInt32();
 
 				s.Seek(nameoffset, SeekOrigin.Begin);
-				string name = Encoding.ASCII.GetString(br.ReadBytes((int)namelength - 1));
+				string name = Encoding.ASCII.GetString(br.ReadBytes((int)namelength - 1)).ToLower();
 				s.Seek(dataoffset, SeekOrigin.Begin);
 				byte[] data = br.ReadBytes((int)datalength);
 
@@ -50,9 +50,10 @@ namespace Yuka.Data.Factory {
 			// Write data sector
 			foreach(var file in data.files) {
 				uint dataoffset = (uint)s.Position;
+				/*
 				if(FlagCollection.current.Has('v')) {
 					Console.WriteLine("Packing file: " + file.Key);
-				}
+				}//*/
 				MemoryStream ms = data.GetInputStream(file.Key);
 				ms.CopyTo(s);
 				//s.Write(data, 0, data.Length);

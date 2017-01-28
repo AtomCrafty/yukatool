@@ -14,6 +14,9 @@ namespace Yuka {
 		public const string unwrappedGraphicsExtension = "png";
 		public const string frameMetaExtension = "meta";
 
+		public const string archiveExtension = "ykc";
+		public const string patchLogExtension = "ypl";
+
 		public static Dictionary<string, string> knownVars = new Dictionary<string, string>();
 
 		static Constants() {
