@@ -48,8 +48,8 @@ namespace Yuka.Tasks {
 				}
 				Console.ReadLine();
 			}
-			else if(Path.GetExtension(arguments[0]) == ".ykg") {
-				string path = Path.Combine(Path.GetTempPath(), Path.ChangeExtension(Path.GetFileName(arguments[0]), "png"));
+			else if(Path.GetExtension(arguments[0]) == '.' + Constants.ykg) {
+				string path = Path.Combine(Path.GetTempPath(), Path.ChangeExtension(Path.GetFileName(arguments[0]), Constants.png));
 				using(FileStream fs = new FileStream(Helpers.AbsolutePath(arguments[0]), FileMode.Open)) {
 					YukaGraphics g = GraphicsFactory.Instance.FromBinary(fs);
 					g.bitmap.Save(path);
@@ -61,10 +61,15 @@ namespace Yuka.Tasks {
 				if(File.Exists(patchLogPath)) {
 				}
 			}
-			else if(Path.GetExtension(arguments[0]) == ".ypl") {
+			else if(Path.GetExtension(arguments[0]) == '.' + Constants.ypl) {
 				flags.Set('v');
 				flags.Set('w');
 				new PatchTask(arguments, flags).Run();
+			}
+			else if(Path.GetExtension(arguments[0]) == '.' + Constants.ydr) {
+				flags.Set('v');
+				flags.Set('w');
+				new DeployTask(arguments, flags).Run();
 			}
 			else {
 				Fail("Unable to auto determine processing method");

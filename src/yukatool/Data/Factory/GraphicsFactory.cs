@@ -61,8 +61,6 @@ namespace Yuka.Data.Factory {
 
 				colorLayer = colorLayer != null ? colorLayer.Clone(rect, PixelFormat.Format32bppArgb) : new Bitmap(alphaLayer.Width, alphaLayer.Height, PixelFormat.Format32bppArgb);
 
-				colorLayer.Save(@"S:\Games\Visual Novels\Lover Able\data02-org-raw\system_.png");
-
 				BitmapData colorBits = colorLayer.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
 				BitmapData alphaBits = alphaLayer.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
 

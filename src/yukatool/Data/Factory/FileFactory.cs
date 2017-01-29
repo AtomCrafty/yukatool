@@ -20,9 +20,8 @@ namespace Yuka.Data.Factory {
 			return RawFactory.Instance;
 		}
 
-		// TODO
 		public static FileFactory ForExtension(string extension) {
-			throw new NotImplementedException();
+			return ForDataType(DataTypes.ForExtension(extension));
 		}
 
 		public FileFactory(DataType Type) {

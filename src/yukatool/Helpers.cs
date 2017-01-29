@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Security.Cryptography;
 
 namespace Yuka {
 	static class Helpers {
@@ -21,6 +22,17 @@ namespace Yuka {
 			while(length > 0 && (read = source.Read(buffer, 0, Math.Min(buffer.Length, length))) > 0) {
 				target.Write(buffer, 0, read);
 				length -= read;
+			}
+		}
+
+		public static long FileSize(string path) {
+			return new FileInfo(path).Length;
+		}
+
+		public static string FileHash(string path) {
+			using(HashAlgorithm hasher = new MD5CryptoServiceProvider())
+			using(FileStream fs = new FileStream(path, FileMode.Open)) {
+				return Convert.ToBase64String(hasher.ComputeHash(fs));
 			}
 		}
 	}

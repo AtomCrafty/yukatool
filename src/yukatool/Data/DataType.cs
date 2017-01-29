@@ -20,11 +20,45 @@ namespace Yuka.Data {
 				case png: return DataType.Graphics;
 				case yks: return DataType.Script;
 				case ykd: return DataType.Script;
+				case ypl: return DataType.Internal;
+				case ydr: return DataType.Internal;
 				case csv: return DataType.None;
 				case meta: return DataType.None;
-				case ypl: return DataType.Internal;
 			}
 			return DataType.None;
+		}
+
+		public static string SourceExtension(this DataType type) {
+			switch(type) {
+				case DataType.Archive: return ykc;
+				case DataType.Graphics: return png;
+				case DataType.Script: return ykd;
+			}
+			return "";
+		}
+
+		public static string BaseExtension(string currentExtension) {
+			switch(currentExtension.Trim('.').ToLower()) {
+				case ykc: return ykc;
+				case ykg: return ykg;
+				case png: return png;
+				case yks: return yks;
+				case ykd: return ykd;
+				case csv: return ykd;
+				case meta: return png;
+				case ypl: return ypl;
+				case ydr: return ydr;
+			}
+			return "";
+		}
+
+		public static string BinaryExtension(this DataType type) {
+			switch(type) {
+				case DataType.Archive: return ykc;
+				case DataType.Graphics: return ykg;
+				case DataType.Script: return yks;
+			}
+			return "";
 		}
 	}
 }

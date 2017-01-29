@@ -17,6 +17,7 @@ namespace Yuka {
 			Task.Register("pack", new PackTask());
 			Task.Register("unwrap", new UnwrapTask());
 			Task.Register("wrap", new WrapTask());
+			Task.Register("deploy", new DeployTask());
 
 			Task.Register("auto", new AutoTask());
 

@@ -38,7 +38,7 @@ namespace Yuka.Tasks {
 				info.fetchurl = fetchUrl;
 				info.history = new JArray();
 
-				File.WriteAllText(patchFilePath, JsonConvert.SerializeObject(info));
+				File.WriteAllText(patchFilePath, JsonConvert.SerializeObject(info, Formatting.Indented));
 
 				Console.WriteLine("GameDir:   " + gameDirectory);
 				Console.WriteLine("PatchDir:  " + patchDirectory);
@@ -80,7 +80,7 @@ namespace Yuka.Tasks {
 					if(fetchUrl != null && fetchUrl.Length > 2) {
 						using(WebClient web = new WebClient()) {
 							Log("Fetching patch list from " + fetchUrl, ConsoleColor.Yellow);
-							string[] remoteFiles = web.DownloadString(fetchUrl).Split('\n');
+							string[] remoteFiles = web.DownloadString(fetchUrl).Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
 							foreach(string fileUri in remoteFiles) {
 								if(fileUri == "") continue;
@@ -139,7 +139,7 @@ namespace Yuka.Tasks {
 					}
 
 					info.history = JArray.FromObject(history.ToArray());
-					File.WriteAllText(targetBasePath, JsonConvert.SerializeObject(info));
+					File.WriteAllText(targetBasePath, JsonConvert.SerializeObject(info, Formatting.Indented));
 				}
 			}
 
