@@ -35,7 +35,7 @@ namespace Yuka.Tasks {
 
 			for(int i = 0; i < files.Length; i++) {
 				string sourcePath = files[i];
-				string localPath = sourcePath.Substring(sourceBasePath.Length).TrimStart('\\').ToLower();
+				string localPath = Helpers.RelativePath(sourcePath, sourceBasePath);
 				string extension = Path.GetExtension(localPath);
 				DataType type = DataTypes.ForExtension(extension);
 

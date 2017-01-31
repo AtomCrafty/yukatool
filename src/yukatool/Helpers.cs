@@ -8,6 +8,10 @@ namespace Yuka {
 			return Path.Combine(Directory.GetCurrentDirectory(), path);
 		}
 
+		public static string RelativePath(string path, string basePath) {
+			return path.Substring(basePath.Length).TrimStart('\\').ToLower();
+		}
+
 		public static BinaryReader Reader(string path) {
 			return new BinaryReader(new FileStream(path, FileMode.Open));
 		}

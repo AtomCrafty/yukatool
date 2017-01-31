@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Yuka.Data;
+using Yuka.Data.Factory;
 using Yuka.Script;
 
 namespace Yuka.Tasks {
@@ -34,9 +35,8 @@ namespace Yuka.Tasks {
 
 			for(int i = 0; i < files.Length; i++) {
 				string sourcePath = files[i];
-				string localPath = sourcePath.Substring(sourceBasePath.Length).TrimStart('\\').ToLower();
+				string localPath = Helpers.RelativePath(sourcePath, sourceBasePath);
 				string targetPath = Path.ChangeExtension(Path.Combine(targetBasePath, localPath), Constants.ykd);
-				string metaPath = Path.ChangeExtension(Path.Combine(targetBasePath, localPath), Constants.csv);
 
 				currentFile = localPath;
 
@@ -49,64 +49,13 @@ namespace Yuka.Tasks {
 					Console.WriteLine();
 				}
 
-				Decompiler decomp = new Decompiler();
-				FileStream fs = new FileStream(sourcePath, FileMode.Open);
-				YukaScript script = decomp.FromBinary(fs);
-				fs.Close();
-
-				string source = script.Source();
-
-				/*if(flags.Has('v')) {
-					Console.Write(source);
-				}*/
-
 				Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
 
-				StreamWriter w = new StreamWriter(new FileStream(targetPath, FileMode.Create));
-				w.Write(source);
-				w.Close();
-
-				if(script.stringTable.Count > 0) {
-					w = new StreamWriter(new FileStream(metaPath, FileMode.Create));
-					w.WriteLine("ID,Speaker,Original,Translation,TLC,Edit,QC,Comments,Generated");
-					// write names
-					bool flag = false;
-					foreach(var entry in script.stringTable) {
-						if(entry.Key.StartsWith("N")) {
-							if(!flag) {
-								w.WriteLine("\n#Names:");
-								flag = true;
-							}
-							w.WriteLine(entry.Key + ",," + entry.Value);
-						}
-					}
-					// write lines
-					flag = false;
-					foreach(var entry in script.stringTable) {
-						if(!entry.Key.StartsWith("N")) {
-							if(!flag) {
-								w.WriteLine("\n#Lines:");
-								flag = true;
-							}
-
-							string speaker = "";
-							string line = entry.Value;
-
-							int index = line.IndexOf('|');
-							if(index >= 0) {
-								speaker = line.Substring(0, index);
-								line = line.Substring(index + 1);
-							}
-
-							line = "\"" + line.Replace("\"", "\"\"") + "\"";
-
-							w.WriteLine(entry.Key + ',' + speaker + ',' + line);
-						}
-					}
-					w.Close();
-				}
+				YukaScript script = ScriptFactory.Instance.FromBinary(new FileStream(sourcePath, FileMode.Open));
+				ScriptFactory.Instance.ToSource(script, targetPath);
 			}
 			currentFile = "";
+
 			if(flags.Has('w')) {
 				Console.ReadLine();
 			}

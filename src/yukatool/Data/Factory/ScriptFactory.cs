@@ -14,7 +14,7 @@ namespace Yuka.Data.Factory {
 		}
 
 		public override YukaScript FromSource(string filename) {
-			return new Compiler().FromSource(filename, Path.ChangeExtension(filename, csv));
+			return new Compiler().FromSource(Path.ChangeExtension(filename, ykd), Path.ChangeExtension(filename, csv));
 		}
 
 		public override long ToBinary(YukaScript data, Stream s) {
@@ -22,7 +22,7 @@ namespace Yuka.Data.Factory {
 		}
 
 		public override void ToSource(YukaScript data, string filename) {
-			File.WriteAllText(filename, data.Source());
+			new Decompiler().ToSource(data, filename);
 		}
 	}
 }

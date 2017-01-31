@@ -14,10 +14,13 @@ namespace Yuka.Tasks {
 			flags.Add('v', "verbose", "Outputs additional information", false);
 			flags.Add('w', "wait", "Waits for enter before closing the console", false);
 			flags.Add('p', "progress", "Display a progress bar", false);
+			flags.Add('r', "raw", "Disables auto-conversion of binary files", false);
 		}
 
 		protected override void Execute() {
 			if(arguments.Length == 0) Fail("No source file specified");
+
+			if(flags.Has('v')) flags.Unset('p');
 
 			string sourceBasePath = Helpers.AbsolutePath(arguments[0]);
 			string targetBasePath = arguments.Length > 1 ? Helpers.AbsolutePath(arguments[1]) : Path.ChangeExtension(sourceBasePath, "");
@@ -26,6 +29,7 @@ namespace Yuka.Tasks {
 				Fail("The specified source file does not exist");
 			}
 
+			// read archive
 			YukaArchive archive = ArchiveFactory.Instance.FromSource(sourceBasePath);
 
 			if(flags.Has('p')) {
@@ -41,17 +45,26 @@ namespace Yuka.Tasks {
 
 				if(flags.Has('v')) {
 					Console.WriteLine();
-					Console.WriteLine("SourceBase: " + sourceBasePath);
-					Console.WriteLine("TargetBase: " + targetBasePath);
-					Console.WriteLine("Target:     " + targetPath);
-					Console.WriteLine("Local:      " + localPath);
+					Console.WriteLine("SourceBase: {0}", sourceBasePath);
+					Console.WriteLine("TargetBase: {0}", targetBasePath);
+					Console.WriteLine("Target:     {0}", targetPath);
+					Console.WriteLine("Local:      {0}", localPath);
 				}
 
 				Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
 
-				FileStream fs = new FileStream(targetPath, FileMode.Create);
-				archive.GetInputStream(file.Key).CopyTo(fs);
-				fs.Close();
+				if(flags.Has('r') || !DataTypes.ConvertOnUnpack(Path.GetExtension(localPath))) {
+					// output raw data
+					FileStream fs = new FileStream(targetPath, FileMode.Create);
+					archive.GetInputStream(file.Key).CopyTo(fs);
+					fs.Close();
+				}
+				else {
+					// convert data on extraction
+					dynamic factory = FileFactory.ForExtension(Path.GetExtension(localPath));
+					dynamic data = factory.FromBinary(archive.GetInputStream(file.Key));
+					factory.ToSource(data, targetPath);
+				}
 
 				count++;
 				if(flags.Has('p')) {

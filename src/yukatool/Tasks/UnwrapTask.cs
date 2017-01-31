@@ -34,7 +34,7 @@ namespace Yuka.Tasks {
 
 			for(int i = 0; i < files.Length; i++) {
 				string sourcePath = files[i];
-				string localPath = sourcePath.Substring(sourceBasePath.Length).TrimStart('\\').ToLower();
+				string localPath = Helpers.RelativePath(sourcePath, sourceBasePath);
 				string targetPath = Path.ChangeExtension(Path.Combine(targetBasePath, localPath), Constants.png);
 
 				currentFile = localPath;

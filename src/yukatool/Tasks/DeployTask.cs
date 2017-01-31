@@ -60,7 +60,7 @@ namespace Yuka.Tasks {
 
 							dynamic entry = new JObject();
 							{
-								entry.name = file.Substring(targetPath.Length).TrimStart('\\').ToLower();
+								entry.name = Helpers.RelativePath(file, targetPath);
 								entry.size = Helpers.FileSize(file);
 								entry.hash = Helpers.FileHash(file);
 								entry.version = 0;
@@ -88,7 +88,7 @@ namespace Yuka.Tasks {
 						List<string> includedFiles = new List<string>();
 						string[] files = Directory.GetFiles((string)target.path, "*", SearchOption.AllDirectories);
 						foreach(string file in files) {
-							string localName = file.Substring(((string)target.path).Length).TrimStart('\\').ToLower();
+							string localName = Helpers.RelativePath(file, (string)target.path);
 
 							// ignore unrecognized file types
 							if(!DataTypes.ForExtension(Path.GetExtension(localName)).IncludeInArchive()) continue;

@@ -526,5 +526,54 @@ namespace Yuka.Script {
 			// interpret the list of bytes as a Shift-JIS encoded string and return it.
 			return Encoding.GetEncoding("shift-jis").GetString(data.ToArray());
 		}
+
+		public void ToSource(YukaScript script, string path) {
+			string sourcePath = Path.ChangeExtension(path, Constants.ykd);
+			string stringPath = Path.ChangeExtension(path, Constants.csv);
+
+			// write source code
+			File.WriteAllText(sourcePath, script.Source());
+
+			// write string data
+			if(script.stringTable.Count > 0) {
+				StreamWriter w = new StreamWriter(new FileStream(stringPath, FileMode.Create));
+				w.WriteLine("ID,Speaker,Original,Translation,TLC,Edit,QC,Comments,Generated");
+				// write names
+				bool flag = false;
+				foreach(var entry in script.stringTable) {
+					if(entry.Key.StartsWith("N")) {
+						if(!flag) {
+							w.WriteLine("\n#Names:");
+							flag = true;
+						}
+						w.WriteLine(entry.Key + ",," + entry.Value);
+					}
+				}
+				// write lines
+				flag = false;
+				foreach(var entry in script.stringTable) {
+					if(!entry.Key.StartsWith("N")) {
+						if(!flag) {
+							w.WriteLine("\n#Lines:");
+							flag = true;
+						}
+
+						string speaker = "";
+						string line = entry.Value;
+
+						int index = line.IndexOf('|');
+						if(index >= 0) {
+							speaker = line.Substring(0, index);
+							line = line.Substring(index + 1);
+						}
+
+						line = "\"" + line.Replace("\"", "\"\"") + "\"";
+
+						w.WriteLine(entry.Key + ',' + speaker + ',' + line);
+					}
+				}
+				w.Close();
+			}
+		}
 	}
 }
