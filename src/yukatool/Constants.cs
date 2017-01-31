@@ -15,6 +15,10 @@ namespace Yuka {
 		public const string meta = "meta";
 
 		public const string ykc = "ykc";
+		public const string ini = "ini";
+
+		public const string ogg = "ogg";
+
 		public const string ypl = "ypl";
 		public const string ydr = "ydr";
 
@@ -175,10 +179,10 @@ namespace Yuka {
 			knownVars["flag_5210"] = "bonus_current_scene";
 
 			knownVars["flag_5230"] = "bonus_hairstyle_1";
-			knownVars["flag_5231"] = "";
+			knownVars["flag_5231"] = "bonus_hairstyle_2";
 
-			knownVars["flag_5240"] = "";
-			knownVars["flag_5241"] = "";
+			knownVars["flag_5240"] = "bonus_clothes_1";
+			knownVars["flag_5241"] = "bonus_clothes_2";
 
 			knownVars["flag_5510"] = "bonus_current_hairstyle";
 			knownVars["flag_5520"] = "bonus_current_clothes";
@@ -317,10 +321,17 @@ namespace Yuka {
 			knownVars["globalflag_349"] = "cg_unlocked_satsuki_10";
 			knownVars["globalflag_350"] = "cg_unlocked_satsuki_11";
 			knownVars["globalflag_351"] = "cg_unlocked_satsuki_12";
+			knownVars["globalflag_352"] = "cg_unlocked_satsuki_13";
+			knownVars["globalflag_353"] = "cg_unlocked_satsuki_14";
+			knownVars["globalflag_354"] = "cg_unlocked_satsuki_15";
+			knownVars["globalflag_355"] = "cg_unlocked_satsuki_16";
+			knownVars["globalflag_356"] = "cg_unlocked_satsuki_17";
 
 			knownVars["globalflag_450"] = "scene_unlocked_chinatsu_1";
 			knownVars["globalflag_451"] = "scene_unlocked_chinatsu_2";
 			knownVars["globalflag_452"] = "scene_unlocked_chinatsu_3";
+			knownVars["globalflag_453"] = "scene_unlocked_chinatsu_4";
+			knownVars["globalflag_454"] = "scene_unlocked_chinatsu_5";
 
 			knownVars["globalflag_460"] = "scene_unlocked_kaho_1";
 			knownVars["globalflag_461"] = "scene_unlocked_kaho_2";
@@ -338,10 +349,13 @@ namespace Yuka {
 			knownVars["globalflag_481"] = "scene_unlocked_nanako_2";
 			knownVars["globalflag_482"] = "scene_unlocked_nanako_3";
 			knownVars["globalflag_483"] = "scene_unlocked_nanako_4";
+			knownVars["globalflag_484"] = "scene_unlocked_nanako_5";
 
 			knownVars["globalflag_490"] = "scene_unlocked_satsuki_1";
 			knownVars["globalflag_491"] = "scene_unlocked_satsuki_2";
 			knownVars["globalflag_492"] = "scene_unlocked_satsuki_3";
+			knownVars["globalflag_493"] = "scene_unlocked_satsuki_4";
+			knownVars["globalflag_494"] = "scene_unlocked_satsuki_5";
 
 			knownVars["globalflag_500"] = "menu_transition";
 

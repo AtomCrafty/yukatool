@@ -36,6 +36,12 @@ namespace Yuka.Tasks {
 			for(int i = 0; i < files.Length; i++) {
 				string sourcePath = files[i];
 				string localPath = sourcePath.Substring(sourceBasePath.Length).TrimStart('\\').ToLower();
+				string extension = Path.GetExtension(localPath);
+				DataType type = DataTypes.ForExtension(extension);
+
+				// ignore unknown file types and hidden files
+				if(!type.IncludeInArchive()) continue;
+				if(new FileInfo(sourcePath).Attributes.HasFlag(FileAttributes.Hidden)) continue;
 
 				currentFile = localPath;
 
@@ -47,10 +53,20 @@ namespace Yuka.Tasks {
 					Console.WriteLine("Local:      " + localPath);
 				}
 
-				FileStream fs = new FileStream(sourcePath, FileMode.Open);
-				MemoryStream ms = archive.GetOutputStream(localPath);
-				fs.CopyTo(ms);
-				fs.Close();
+				if(DataTypes.ConvertOnPack(extension)) {
+					// File needs to be converted
+					string realPath = Path.ChangeExtension(localPath, type.BinaryExtension());
+					MemoryStream ms = archive.GetOutputStream(realPath);
+					dynamic factory = FileFactory.ForDataType(type);
+					dynamic data = factory.FromSource(sourcePath);
+					factory.ToBinary(data, ms);
+				}
+				else {
+					MemoryStream ms = archive.GetOutputStream(localPath);
+					FileStream fs = new FileStream(sourcePath, FileMode.Open);
+					fs.CopyTo(ms);
+					fs.Close();
+				}
 			}
 			currentFile = "";
 
