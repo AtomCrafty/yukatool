@@ -55,6 +55,9 @@ namespace Yuka.Tasks {
 						target.path = targetPath;
 						target.files = new JArray();
 						foreach(string file in files) {
+							// ignore unrecognized file types
+							if(!DataTypes.ForExtension(Path.GetExtension(file)).IncludeInArchive()) continue;
+
 							dynamic entry = new JObject();
 							{
 								entry.name = file.Substring(targetPath.Length).TrimStart('\\').ToLower();
@@ -86,7 +89,9 @@ namespace Yuka.Tasks {
 						string[] files = Directory.GetFiles((string)target.path, "*", SearchOption.AllDirectories);
 						foreach(string file in files) {
 							string localName = file.Substring(((string)target.path).Length).TrimStart('\\').ToLower();
-							// Log(localName, ConsoleColor.DarkGray);
+
+							// ignore unrecognized file types
+							if(!DataTypes.ForExtension(Path.GetExtension(localName)).IncludeInArchive()) continue;
 
 							bool include = true, exists = false;
 							foreach(var localFile in target.files) {
