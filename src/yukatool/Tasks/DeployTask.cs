@@ -39,6 +39,8 @@ namespace Yuka.Tasks {
 
 				Directory.CreateDirectory(deployDirectory);
 
+				int fileCount = 0;
+
 				dynamic info = new JObject();
 				info.build = 0;
 				info.nameschema = "inc.{buildno}.{target}.patch.ykc";
@@ -55,8 +57,9 @@ namespace Yuka.Tasks {
 						target.path = targetPath;
 						target.files = new JArray();
 						foreach(string file in files) {
-							// ignore unrecognized file types
+							// ignore unknown file types and hidden files
 							if(!DataTypes.ForExtension(Path.GetExtension(file)).IncludeInArchive()) continue;
+							if(new FileInfo(file).Attributes.HasFlag(FileAttributes.Hidden)) continue;
 
 							dynamic entry = new JObject();
 							{
@@ -66,12 +69,14 @@ namespace Yuka.Tasks {
 								entry.version = 0;
 							}
 							target.files.Add(entry);
+
+							fileCount++;
 						}
 					}
 					info.targets.Add(target);
 					Log("Added target '" + targetName + "' (" + target.files.Count + " files) [" + targetPath + "]", ConsoleColor.Yellow);
 				}
-				Log("Successfully added " + info.targets.Count + " targets", ConsoleColor.Green);
+				Log("Successfully added " + fileCount + " file in " + info.targets.Count + " targets", ConsoleColor.Green);
 
 				File.WriteAllText(deployFilePath, JsonConvert.SerializeObject(info, Formatting.Indented));
 			}
@@ -79,6 +84,8 @@ namespace Yuka.Tasks {
 			else {
 				if(arguments.Length == 0) Fail("No target file specified");
 				string deployFilePath = Helpers.AbsolutePath(arguments[0]);
+
+				int changedFiles = 0, newFiles = 0;
 
 				if(deployFilePath.EndsWith(Constants.ydr, StringComparison.OrdinalIgnoreCase)) {
 					dynamic info = JsonConvert.DeserializeObject(File.ReadAllText(deployFilePath));
@@ -90,8 +97,9 @@ namespace Yuka.Tasks {
 						foreach(string file in files) {
 							string localName = Helpers.RelativePath(file, (string)target.path);
 
-							// ignore unrecognized file types
+							// ignore unknown file types and hidden files
 							if(!DataTypes.ForExtension(Path.GetExtension(localName)).IncludeInArchive()) continue;
+							if(new FileInfo(file).Attributes.HasFlag(FileAttributes.Hidden)) continue;
 
 							bool include = true, exists = false;
 							foreach(var localFile in target.files) {
@@ -120,12 +128,14 @@ namespace Yuka.Tasks {
 									entry.version = 1;
 								}
 								target.files.Add(entry);
+								newFiles++;
 							}
 							if(include) {
 								string mainFile = Path.ChangeExtension(localName, DataTypes.BaseExtension(Path.GetExtension(localName)));
 								if(!includedFiles.Contains(mainFile)) {
 									includedFiles.Add(mainFile);
 									if(exists) Log("[Changed]    " + localName, ConsoleColor.Yellow);
+									if(exists) changedFiles++;
 								}
 							}
 							else {
@@ -160,6 +170,8 @@ namespace Yuka.Tasks {
 							if(verbose) flags.Set('v');
 						}
 					}
+
+					Log("Deployed " + newFiles + " new files and " + changedFiles + " updates", ConsoleColor.Green);
 
 					File.WriteAllText(deployFilePath, JsonConvert.SerializeObject(info, Formatting.Indented));
 				}
