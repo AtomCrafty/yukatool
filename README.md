@@ -29,4 +29,6 @@ Flags do **not** have to be at the beginning and can be specified in a long or s
 `-rvw` adds the flags `--raw`, `--verbose` and `--wait`  
 Which flags are available depends on the task you want to execute.  
 
+![Editing scripts](http://i.imgur.com/WpoqK36.png)
+
 If you want to contribute or have any questions regarding the project, feel free to contact me at atomcrafty@frucost.net :)
