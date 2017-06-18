@@ -59,6 +59,7 @@ namespace Yuka.Tasks {
 			else if(Directory.Exists(arguments[0])) {
 				string patchLogPath = Path.Combine(Helpers.AbsolutePath(arguments[0]), "patch.ypl");
 				if(File.Exists(patchLogPath)) {
+					// TODO
 				}
 			}
 			else if(Path.GetExtension(arguments[0]) == '.' + Constants.ypl) {

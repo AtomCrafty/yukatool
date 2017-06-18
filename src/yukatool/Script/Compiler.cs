@@ -289,7 +289,7 @@ namespace Yuka.Script {
 					#endregion
 					#region Switch statement
 					return new SwitchFunctionScriptElement((elem as FuncCallScriptElement).name, (elem as FuncCallScriptElement).parameters, body);
-					#endregion
+				#endregion
 				#endregion
 				default:
 					return elem;
@@ -647,12 +647,12 @@ namespace Yuka.Script {
 					else {
 						// flatten all non-data parameters
 						list.AddRange(Flatten(param, true));
-						parameters[i] = new DataScriptElement(new VarTempRefDataElement(tempVarID));
+						parameters[i] = new DataScriptElement(new VarTempRefDataElement(tempVarID - 1));
 					}
 				}
 
 				if(nested) {
-					list.Add(new DataScriptElement(new VarTempRefDataElement(++tempVarID)));
+					list.Add(new DataScriptElement(new VarTempRefDataElement(tempVarID++)));
 					list.Add(new FuncCallScriptElement("=", new ScriptElement[0]));
 				}
 				list.Add(new FuncCallScriptElement((elem as FuncCallScriptElement).name, parameters));
@@ -675,11 +675,11 @@ namespace Yuka.Script {
 					else {
 						// flatten all non-data parameters
 						list.AddRange(Flatten(param, true));
-						parameters[i * 2] = new DataScriptElement(new VarTempRefDataElement(tempVarID));
+						parameters[i * 2] = new DataScriptElement(new VarTempRefDataElement(tempVarID - 1));
 					}
 				}
 
-				list.Add(new DataScriptElement(new VarTempRefDataElement(++tempVarID)));
+				list.Add(new DataScriptElement(new VarTempRefDataElement(tempVarID++)));
 				list.Add(new FuncCallScriptElement("=", parameters));
 			}
 			else if(elem is BranchScriptElement) {
@@ -687,7 +687,7 @@ namespace Yuka.Script {
 
 				if(!(cond is DataScriptElement)) {
 					list.AddRange(Flatten(cond, true));
-					cond = new DataScriptElement(new VarTempRefDataElement(tempVarID));
+					cond = new DataScriptElement(new VarTempRefDataElement(tempVarID - 1));
 				}
 
 				ControlDataElement openingThen = new ControlDataElement("{"), closingThen = new ControlDataElement("}"), openingElse = null, closingElse = null;
@@ -733,7 +733,7 @@ namespace Yuka.Script {
 					else {
 						// flatten all non-data parameters
 						list.AddRange(Flatten(param, true));
-						parameters[i] = new DataScriptElement(new VarTempRefDataElement(tempVarID));
+						parameters[i] = new DataScriptElement(new VarTempRefDataElement(tempVarID - 1));
 					}
 				}
 
@@ -756,10 +756,10 @@ namespace Yuka.Script {
 				if(expr is DataScriptElement) {
 					// special exception for the $ variable (e.g. clear_main.yks)
 					if(var is IntDataElement) {
-						list.Add(new DataScriptElement(new VarTempRefDataElement(++tempVarID)));
+						list.Add(new DataScriptElement(new VarTempRefDataElement(tempVarID++)));
 						list.Add(new FuncCallScriptElement("=", new[] { expr }));
 						list.Add(new DataScriptElement(var));
-						list.Add(new FuncCallScriptElement("=", new[] { new DataScriptElement(new VarTempRefDataElement(tempVarID)) }));
+						list.Add(new FuncCallScriptElement("=", new[] { new DataScriptElement(new VarTempRefDataElement(tempVarID - 1)) }));
 					}
 					else {
 						list.Add(new DataScriptElement(var));
@@ -772,7 +772,7 @@ namespace Yuka.Script {
 					if(var is IntDataElement) {
 						list.AddRange(cmds);
 						list.Add(new DataScriptElement(var));
-						list.Add(new FuncCallScriptElement("=", new[] { new DataScriptElement(new VarTempRefDataElement(tempVarID)) }));
+						list.Add(new FuncCallScriptElement("=", new[] { new DataScriptElement(new VarTempRefDataElement(tempVarID - 1)) }));
 					}
 					else {
 						// replace the last temp var reference by the variable
