@@ -79,7 +79,7 @@ namespace Yuka.Tasks {
 					int finishedDownloads = 0, skippedDownloads = 0;
 					if(fetchUrl != null && fetchUrl.Length > 2) {
 						using(WebClient web = new WebClient()) {
-							Log("Fetching patch list from " + fetchUrl, ConsoleColor.Yellow);
+							Log("Fetching patch list from " + fetchUrl, ConsoleColor.Cyan);
 							string[] remoteFiles = web.DownloadString(fetchUrl).Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
 							foreach(string fileUri in remoteFiles) {

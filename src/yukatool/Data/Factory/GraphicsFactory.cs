@@ -137,8 +137,8 @@ namespace Yuka.Data.Factory {
 
 			Bitmap bitmap = new Bitmap(filename);
 
-			if(File.Exists(Path.ChangeExtension(filename, "meta"))) {
-				metaData = File.ReadAllBytes(Path.ChangeExtension(filename, "meta"));
+			if(File.Exists(Path.ChangeExtension(filename, meta))) {
+				metaData = File.ReadAllBytes(Path.ChangeExtension(filename, meta));
 			}
 
 			return new YukaGraphics(bitmap, metaData);
@@ -147,10 +147,10 @@ namespace Yuka.Data.Factory {
 		public override void ToSource(YukaGraphics graphics, string filename) {
 			Directory.CreateDirectory(Path.GetDirectoryName(filename));
 
-			graphics.bitmap.Save(filename);
+			graphics.bitmap.Save(Path.ChangeExtension(filename, png));
 
 			if(graphics.metaData != null) {
-				File.WriteAllBytes(Path.ChangeExtension(filename, "meta"), graphics.metaData);
+				File.WriteAllBytes(Path.ChangeExtension(filename, meta), graphics.metaData);
 			}
 		}
 	}

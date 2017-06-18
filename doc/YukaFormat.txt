@@ -69,7 +69,7 @@ YukaScript		(yks)
 		- Structure
 			- Type				01 00 00 00					yukatool: DataElement.TYPE_CTRL
 			- Name offset		?? ?? ?? ??					offset of the element name within the data sector
-			- Last instruction	?? ?? ?? ??					offset of the "jump offset" value within the data sector
+			- Jump offset		?? ?? ?? ??					offset of the "jump offset" value within the data sector
 			- Unknown			FF FF FF FF
 	- Integer constant
 		- 32 bit signed integer constant, used as a value and in special occasions as some sort of flag pointer (more on that later)

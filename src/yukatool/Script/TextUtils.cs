@@ -4,8 +4,8 @@ using System.Text;
 
 namespace Yuka.Script {
 	class TextUtils {
-		const int defaultLineWidth = 50;
-		const string doubleWidthChars = "～♪";
+		public static int defaultLineWidth = 50;
+		public static string doubleWidthChars = "～~♪「」『』";
 
 		public static int StringWidth(string word) {
 			int len = word.Length;
@@ -18,7 +18,7 @@ namespace Yuka.Script {
 		}
 
 		public static string Prefix(string word, int width) {
-			int len = 0;
+			double len = 0;
 			for(int i = 0; i < word.Length; i++) {
 				char cur = word[i];
 				if(doubleWidthChars.Contains(cur)) {
@@ -26,7 +26,7 @@ namespace Yuka.Script {
 						// we'd have to cut the current char in half, so we omit it.
 						return word.Substring(0, i);
 					}
-					len += 2;
+					len += 2.01;
 				}
 				else if(len >= width) {
 					return word.Substring(0, i - 1);

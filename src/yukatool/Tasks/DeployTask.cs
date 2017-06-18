@@ -58,7 +58,7 @@ namespace Yuka.Tasks {
 						target.files = new JArray();
 						foreach(string file in files) {
 							// ignore unknown file types and hidden files
-							if(!DataTypes.ForExtension(Path.GetExtension(file)).IncludeInArchive()) continue;
+							if(!DataTypes.ForExtension(DataTypes.BaseExtension(Path.GetExtension(file))).IncludeInArchive()) continue;
 							if(new FileInfo(file).Attributes.HasFlag(FileAttributes.Hidden)) continue;
 
 							dynamic entry = new JObject();
@@ -98,7 +98,7 @@ namespace Yuka.Tasks {
 							string localName = Helpers.RelativePath(file, (string)target.path);
 
 							// ignore unknown file types and hidden files
-							if(!DataTypes.ForExtension(Path.GetExtension(localName)).IncludeInArchive()) continue;
+							if(!DataTypes.ForExtension(DataTypes.BaseExtension(Path.GetExtension(localName))).IncludeInArchive()) continue;
 							if(new FileInfo(file).Attributes.HasFlag(FileAttributes.Hidden)) continue;
 
 							bool include = true, exists = false;

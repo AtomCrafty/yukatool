@@ -1,0 +1,99 @@
+# incomplete
+
+
+meta:
+  id: yks
+  file-extension: yks
+  endian: le
+
+seq:
+  - id: magic
+    contents: ['YKS001', 1, 0]
+  - id: header_length
+    type: u4
+  - type: u4
+  - id: code_offset
+    type: u4
+  - id: instr_count
+    type: u4
+  - id: index_offset
+    type: u4
+  - id: entry_count
+    type: u4
+  - id: data_offset
+    type: u4
+  - id: data_length
+    type: u4
+instances:
+  index:
+    pos: index_offset
+    type: index_entry
+    repeat: expr
+    repeat-expr: entry_count
+  instructions:
+    pos: code_offset
+    type: index_entry
+    repeat: expr
+    repeat-expr: instr_count
+
+types:
+  index_entry:
+    seq:
+      - id: type
+        type: u4
+        enum: data_type
+      - id: data  
+        type: 
+          switch-on: type
+          cases:
+            data_type::func: data_func
+            data_type::ctrl: data_ctrl
+            _: data_dummy
+  data_func:
+    seq:
+      - id: name_offset
+        type: u4
+      - id: last_offset
+        type: u4
+      - type: u4
+    instances:
+      absolute_name_offset:
+        value: _parent._parent.data_offset + name_offset
+      name:
+        pos: absolute_name_offset
+        terminator: 0xaa
+        process: xor(0xaa)
+  data_ctrl:
+    seq:
+      - id: name_offset
+        type: u4
+      - id: last_offset
+        type: u4
+      - type: u4
+    instances:
+      absolute_name_offset:
+        value: _parent._parent.data_offset + name_offset
+      name:
+        pos: absolute_name_offset
+        terminator: 0xaa
+        process: xor(0xaa)
+  data_dummy:
+    seq:
+      - id: meta1
+        type: u4
+      - id: meta2
+        type: u4
+      - id: meta3
+        type: u4
+
+enums:
+  data_type:
+    0:  func
+    1:  ctrl
+    4:  cint
+    5:  cstr
+    8:  vint
+    9:  vstr
+    10: vtmp
+
+

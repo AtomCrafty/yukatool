@@ -8,13 +8,33 @@ using Yuka.Data;
 
 namespace Yuka.Script {
 	class Compiler {
+		/// <summary>
+		/// The table of key - string associations
+		/// </summary>
 		Dictionary<string, string> stringTable = new Dictionary<string, string>();
 
+		/// <summary>
+		/// The table of jump label IDs and their target control element
+		/// </summary>
+		Dictionary<string, ControlDataElement> jumpLabels = new Dictionary<string, ControlDataElement>();
+
+		/// <summary>
+		/// Indicates how many temprary variables have been used so far
+		/// </summary>
+		int tempVarID = 0;
+
+		/// <summary>
+		/// Parses an entire script (.ykd) with optional attached metadata (.csv)
+		/// </summary>
+		/// <param name="scriptPath">Absolute path of the script file (.ykd)</param>
+		/// <param name="stringPath">Absolute path of the meta attachment (.csv)</param>
+		/// <returns>The parsed script</returns>
 		public YukaScript FromSource(string scriptPath, string stringPath) {
-			StreamReader sr;
-			// import string table
+
+			#region Import meta information
 			if(File.Exists(stringPath)) {
-				//string stringData = File.ReadAllText(stringPath);
+				#region Parse CSV
+				StreamReader sr;
 				int offset = -1;
 
 				bool quoted = false;
@@ -83,17 +103,61 @@ namespace Yuka.Script {
 
 				row.Add(cell.ToString());
 				rows.Add(row);
+				#endregion
 
-				//int generatedColumnID = 7;
+				#region Populate string table
+				//int metaColumnID = 7;
 				int maxTextColumn = 6;
 				int minTextColumn = 2;
 
+				int defaultLineWidth = TextUtils.defaultLineWidth;
+				bool removeQuotes = true;
+
 				foreach(List<string> entry in rows) {
+					#region Handle row
+					int lineWidth = defaultLineWidth;
+					if(entry[0].Length > 0 && entry[0][0] == '!') {
+						entry[0] = entry[0].TrimStart('!');
+						if(entry.Count > 1) {
+							string[] metaData = entry[1].Split('\n');
+							string speaker = "";
+							foreach(string meta in metaData) {
+								string[] data = meta.Split(new[] { ':' }, 2);
+								if(data.Length == 2) {
+									switch(data[0].ToLower()) {
+										case "speaker":
+											speaker = data[1];
+											break;
+										case "w":
+										case "cpl":
+										case "width":
+											lineWidth = int.Parse(data[1]);
+											break;
+										case "dw":
+										case "dcpl":
+										case "dwidth":
+										case "defaultwidth":
+										case "defaultlinewidth":
+											defaultLineWidth = int.Parse(data[1]);
+											lineWidth = defaultLineWidth;
+											break;
+										case "rmq":
+										case "rmquotes":
+										case "removequotes":
+											removeQuotes = bool.Parse(data[1]);
+											break;
+									}
+								}
+							}
+							entry[1] = speaker;
+						}
+					}
+
 					if(entry[0].Length > 0 && "LNS".Contains(entry[0][0].ToString())) {
-						/*if(entry.Count > 8 && entry[generatedColumnID].Trim().Length > 0) {
-							Console.WriteLine(entry[0] + ": " + entry[generatedColumnID].Trim('\n'));
-							stringTable[entry[0]] = entry[generatedColumnID].Trim('\n');
-							continue;
+						/*if(entry.Count > metaColumnID && entry[metaColumnID].Trim().Length > 0) {
+							Console.WriteLine(entry[0] + ": " + entry[metaColumnID].Trim('\n'));
+							// stringTable[entry[0]] = entry[metaColumnID].Trim('\n');
+							// continue;
 						}*/
 
 						for(int i = maxTextColumn; i >= minTextColumn; i--) {
@@ -105,7 +169,7 @@ namespace Yuka.Script {
 
 
 									value = value.Trim('\n', '%', '#', '「', '」');
-									if(value.Length > 0 && value[0] == '"' && value[value.Length - 1] == '"') {
+									if(value.Length > 1 && value[0] == '"' && value[value.Length - 1] == '"' && removeQuotes) {
 										value = value.Substring(1, value.Length - 2);
 									}
 
@@ -115,13 +179,13 @@ namespace Yuka.Script {
 									// replace 2 or more dots by exactly 3
 									value = Regex.Replace(value, @"…|[…\.]{2,}", "...");
 									// add a space after ellipses that don't already have one next to them
-									value = Regex.Replace(value, @"(?! )\.\.\.(?! )", "... ");
+									value = Regex.Replace(value, @"(?!^|[\s""])\.\.\.(?=\w)", "... ");
 
 
 
 
 
-									value = TextUtils.WrapWords(value);
+									value = TextUtils.WrapWords(value, lineWidth);
 								}
 
 								//Console.WriteLine(entry[0] + ": " + value);
@@ -130,12 +194,14 @@ namespace Yuka.Script {
 							}
 						}
 					}
+					#endregion
 				}
+				#endregion
 			}
+			#endregion
 
-			//Console.ReadLine();
-
-			BinaryReader br = new BinaryReader(new FileStream(scriptPath, FileMode.Open)); //, Encoding.GetEncoding("shift-jis"));
+			#region Parse script file
+			BinaryReader br = new BinaryReader(new FileStream(scriptPath, FileMode.Open));
 			List<ScriptElement> commands = new List<ScriptElement>();
 
 			SkipWhitespace(br);
@@ -149,12 +215,17 @@ namespace Yuka.Script {
 					}
 				}
 			}
-
 			br.Close();
+			#endregion
 
 			return new YukaScript(commands, stringTable);
 		}
 
+		/// <summary>
+		/// Parses a single script element.
+		/// </summary>
+		/// <param name="br">The BinaryReader used to read characters</param>
+		/// <returns>The parsed script element</returns>
 		ScriptElement NextScriptElement(BinaryReader br) {
 			if(br.BaseStream.Position == br.BaseStream.Length) return null;
 
@@ -166,25 +237,31 @@ namespace Yuka.Script {
 			}
 
 			switch(br.PeekChar()) {
+				#region Assignment
 				case '=':
 					// assignment logic
 					br.ReadChar();
 					SkipWhitespace(br);
 					ScriptElement value = NextValue(br);
 					return new AssignmentScriptElement((elem as DataScriptElement).elem, value);
+				#endregion
+				#region Code block
 				case '{':
 					// nested commands logic
 					br.ReadChar();
 					SkipWhitespace(br);
-					List<ScriptElement> body = new List<ScriptElement>();
 
+					#region Read statements
+					List<ScriptElement> body = new List<ScriptElement>();
 					ScriptElement next;
 					while((next = NextScriptElement(br)) != null && !(next is EndScriptElement)) {
 						if(!(elem is DummyScriptElement)) {
 							body.Add(next);
 						}
 					}
+					#endregion
 
+					#region If statement
 					if((elem as FuncCallScriptElement).name.Equals("if")) {
 						// check for else
 						SkipWhitespace(br);
@@ -209,29 +286,43 @@ namespace Yuka.Script {
 							return new BranchScriptElement((elem as FuncCallScriptElement).parameters[0], body, null);
 						}
 					}
-
-
+					#endregion
+					#region Switch statement
 					return new SwitchFunctionScriptElement((elem as FuncCallScriptElement).name, (elem as FuncCallScriptElement).parameters, body);
+					#endregion
+				#endregion
 				default:
 					return elem;
 			}
 		}
 
+		/// <summary>
+		/// Parses a single expression
+		/// </summary>
+		/// <param name="br">The BinaryReader used to read characters</param>
+		/// <returns>The parsed script element</returns>
 		ScriptElement NextValue(BinaryReader br) {
 			SkipWhitespace(br);
 			int ch = br.PeekChar();
 			switch(ch) {
+				#region End of file
 				case -1:
 					// end of stream
 					return null;
+				#endregion
+				#region End of code block
 				case '}':
 					// end code block
 					br.ReadChar();
 					return new EndScriptElement();
+				#endregion
+				#region Comment
 				case '#':
 					// skip comment
 					while(br.ReadChar() != '\n') ;
 					return new DummyScriptElement();
+				#endregion
+				#region String literal
 				case '"':
 					// read string literal
 					StringBuilder sb = new StringBuilder();
@@ -251,14 +342,20 @@ namespace Yuka.Script {
 						}
 					}
 					return new DataScriptElement(new StringDataElement(sb.ToString()));
+				#endregion
+				#region Jump label
 				case ':':
 					// read jump label
 					br.ReadChar();
 					return new DataScriptElement(new ControlDataElement(NextIdentifier(br)));
+				#endregion
+				#region Externalized string
 				case '@':
 					// read externalized string
 					br.ReadChar();
 					return new DataScriptElement(new ExternalStringDataElement(NextIdentifier(br), stringTable));
+				#endregion
+				#region Expression
 				case '(':
 					// read expression
 					br.ReadChar();
@@ -281,8 +378,10 @@ namespace Yuka.Script {
 					br.ReadChar();
 
 					return new ExpressionScriptElement(parameters.ToArray());
+				#endregion
 				default:
 					if(char.IsDigit((char)ch) || ch == '-') {
+						#region Integer literal
 						// read int literal
 						string value = "";
 						do {
@@ -291,10 +390,12 @@ namespace Yuka.Script {
 						}
 						while(char.IsDigit((char)(ch = br.PeekChar())));
 						return new DataScriptElement(new IntDataElement(int.Parse(value)));
+						#endregion
 					}
 					else {
 						// read var name
 						string name = NextIdentifier(br);
+						#region Variable
 						if(name.StartsWith("$")) {
 							// look up known var name
 							name = name.Substring(1);
@@ -328,6 +429,8 @@ namespace Yuka.Script {
 								return new DataScriptElement(new VarStringRefDataElement("GlobalString", id));
 							}
 						}
+						#endregion
+						#region Function call
 						else {
 							// read method call
 							ch = br.ReadChar();
@@ -347,13 +450,18 @@ namespace Yuka.Script {
 							}
 							return new FuncCallScriptElement(name, param.ToArray());
 						}
+						#endregion
 					}
 					break;
 			}
-
 			return null;
 		}
 
+		/// <summary>
+		/// Reads a string of letters, digits, '_' or '$'
+		/// </summary>
+		/// <param name="br"></param>
+		/// <returns></returns>
 		string NextIdentifier(BinaryReader br) {
 			StringBuilder sb = new StringBuilder();
 			int ch = br.PeekChar();
@@ -368,6 +476,11 @@ namespace Yuka.Script {
 			return sb.ToString();
 		}
 
+		/// <summary>
+		/// Progresses the input stream to the next non-whitespace character
+		/// </summary>
+		/// <param name="br">The BinaryReader used to read characters</param>
+		/// 
 		[DebuggerStepThrough]
 		void SkipWhitespace(BinaryReader br) {
 			while(char.IsWhiteSpace((char)br.PeekChar())) {
@@ -375,8 +488,12 @@ namespace Yuka.Script {
 			}
 		}
 
-		Dictionary<string, ControlDataElement> jumpLabels = new Dictionary<string, ControlDataElement>();
-
+		/// <summary>
+		/// Compiles an entire script into a binary script file (.yks)
+		/// </summary>
+		/// <param name="script">The script instance to compile</param>
+		/// <param name="s">The output stream</param>
+		/// <returns>The number of bytes written</returns>
 		public long ToBinary(YukaScript script, Stream s) {
 			long offset = s.Position;
 
@@ -510,8 +627,12 @@ namespace Yuka.Script {
 			return s.Position - offset;
 		}
 
-		int tempVarID = 0;
-
+		/// <summary>
+		/// Flattens nested script elements to a list
+		/// </summary>
+		/// <param name="elem">The element to flatten</param>
+		/// <param name="nested">Whether this is NOT a top-level element</param>
+		/// <returns>The flattened list of elements</returns>
 		List<ScriptElement> Flatten(ScriptElement elem, bool nested) {
 			List<ScriptElement> list = new List<ScriptElement>();
 			if(elem is FuncCallScriptElement) {
