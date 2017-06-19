@@ -115,6 +115,7 @@
     <Compile Include="Script\TextUtils.cs" />
     <Compile Include="Task.cs" />
     <Compile Include="Data\Factory\ArchiveFactory.cs" />
+    <Compile Include="Tasks\AnalyzeTask.cs" />
     <Compile Include="Tasks\AutoTask.cs" />
     <Compile Include="Tasks\CompileTask.cs" />
     <Compile Include="Helpers.cs" />

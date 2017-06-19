@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace Yuka {
 	static class Helpers {
@@ -27,6 +28,14 @@ namespace Yuka {
 				target.Write(buffer, 0, read);
 				length -= read;
 			}
+		}
+
+		public static string ToZeroTerminatedString(byte[] data, int startIndex) {
+			int length;
+			for(length = 0; startIndex + length < data.Length && data[startIndex + length] != 0; length++) { }
+			var buffer = new byte[length];
+			Array.Copy(data, startIndex, buffer, 0, length);
+			return Encoding.GetEncoding("Shift-JIS").GetString(buffer);
 		}
 
 		public static long FileSize(string path) {

@@ -4,7 +4,6 @@ using System.Text;
 
 namespace Yuka.Script {
 	abstract class ScriptElement {
-
 	}
 
 	class FuncCallScriptElement : ScriptElement {
