@@ -452,8 +452,8 @@ namespace Yuka.Tasks {
 			var w = new StreamWriter(new FileStream(filename, FileMode.Create));
 			w.WriteLine($"<html><head><meta name=\"encoding\" content=\"{w.Encoding.WebName}\"><style>");
 			w.WriteLine("pre        { tab-size: 4; -moz-tab-size: 4; }");
-			w.WriteLine(".error     { color: #ff0000; }");
-			w.WriteLine(".comment   { color: #008000; }");
+			w.WriteLine(".error     { color: #ff0000; font-weigth: bold; }");
+			w.WriteLine(".comment   { color: #999999; }");
 			w.WriteLine(".unused    { color: #aaaaaa; }");
 			w.WriteLine(".const     {  }");
 			w.WriteLine(".const-int { color: #1161ff; }");
