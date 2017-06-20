@@ -19,7 +19,7 @@ namespace Yuka.Script {
 		Dictionary<string, ControlDataElement> jumpLabels = new Dictionary<string, ControlDataElement>();
 
 		/// <summary>
-		/// Indicates how many temprary variables have been used so far
+		/// Indicates how many temporary variables have been used so far
 		/// </summary>
 		int tempVarID = 0;
 
