@@ -4,95 +4,85 @@ using System.Text;
 
 namespace Yuka.Script {
 	class TextUtils {
-		public static int defaultLineWidth = 50;
-		public static string doubleWidthChars = "～~♪「」『』";
+		public static int defaultLineWidth = 600;
 
-		public static int StringWidth(string word) {
-			int len = word.Length;
-			foreach(char ch in word) {
-				if(doubleWidthChars.Contains(ch)) {
-					len++;
-				}
-			}
-			return len;
+		public static bool IsFullWidthCharacter(char ch) {
+			return ch >= 0x3000 && ch < 0x3040 // Japanese-style punctuation
+				|| ch >= 0x3040 && ch < 0x30A0 // Hiragana 
+				|| ch >= 0x30A0 && ch < 0x3100 // Katakana
+				|| ch >= 0xFF00 && ch < 0xFF70 // Full-width roman characters
+				|| ch >= 0x4E00 && ch < 0x9FB0 // CJK unified ideographs - Common and uncommon kanji
+				|| ch >= 0x3400 && ch < 0x4DC0 // CJK unified ideographs Extension A - Rare kanji
+				|| ch >= 0x2600 && ch < 0x2700 // Miscellaneous Symbols
+				|| "─".Contains(ch);
 		}
 
-		public static string Prefix(string word, int width) {
-			double len = 0;
-			for(int i = 0; i < word.Length; i++) {
-				char cur = word[i];
-				if(doubleWidthChars.Contains(cur)) {
-					if(len + 1 == width) {
-						// we'd have to cut the current char in half, so we omit it.
-						return word.Substring(0, i);
-					}
-					len += 2.01;
-				}
-				else if(len >= width) {
-					return word.Substring(0, i - 1);
-				}
-				else {
-					len++;
-				}
-			}
-			return word;
+		public static int StringWidth(string str, FontMetrics metrics) {
+			return str.Aggregate(0, (int l, char ch) => l + metrics.GetCharacterWidth(ch));
 		}
 
-		public static string Space(int length) {
-			return new string(new char[length]).Replace('\0', ' ');
-		}
-
-		public static string WrapWords(string source) {
-			return WrapWords(source, defaultLineWidth);
-		}
-
-		public static string WrapWords(string source, int lineWidth) {
-			string[] words = source.Replace("\r", "").Replace("\\n", "\n").Split(' ');
+		public static string[] WrapWords(string source, int lineWidth, FontMetrics metrics) {
+			int pos = 0;
+			int lastWrap = 0;
+			int lastPossibleWrap = 0;
+			int curWidth = 0;
 			List<string> lines = new List<string>();
-			StringBuilder line = new StringBuilder(lineWidth);
-			int remaining = lineWidth;
 
-			foreach(string w in words) {
-				string word = w;
-				int width = StringWidth(word);
-				while(width > lineWidth) {
-					// if the word wouldn't fit in the whole line, we keep it on the current one.
-					string prefix = Prefix(word, remaining);
-					int len = prefix.Length;
-					word = word.Substring(len);
-					width -= StringWidth(prefix);
-					remaining -= len;
-					line.Append(prefix);
-					line.Append(Space(remaining));
-					lines.Add(line.ToString());
-					line.Clear();
-					remaining = lineWidth;
+			while(pos < source.Length) {
+				char ch = source[pos];
+				int charWidth = metrics.GetCharacterWidth(ch);
+
+				if(curWidth + charWidth > lineWidth) {
+					if(lastPossibleWrap > lastWrap) {
+						// check length of current word
+						int end = pos;
+						while(end < source.Length && !char.IsWhiteSpace(source[end]) && !IsFullWidthCharacter(source[end])) end++;
+						string curWord = source.Substring(lastPossibleWrap, end - lastPossibleWrap).Trim();
+
+						if(StringWidth(curWord, metrics) > lineWidth) {
+							// word wouldn't fit in its own line, so we keep its start on the current one and force a hard wrap (no padding)
+							lines.Add(source.Substring(lastWrap, pos - lastWrap));
+							lastWrap = lastPossibleWrap = pos;
+							curWidth = 0;
+						}
+						else {
+							// push the current word to the next line
+							string line = source.Substring(lastWrap, lastPossibleWrap - lastWrap);
+							int curLineWidth = StringWidth(line, metrics);
+							lastWrap = lastPossibleWrap;
+							curWidth -= curLineWidth;
+
+							// pad and add line
+							lines.Add(line.PadRight(line.Length + (lineWidth - curLineWidth) / metrics.HalfWidthHorizontalSpacing));
+						}
+					}
+					else {
+						// force a hard wrap here (no padding)
+						lines.Add(source.Substring(lastWrap, pos - lastWrap));
+						lastWrap = lastPossibleWrap = pos;
+						curWidth = 0;
+					}
 				}
 
-				if(width > remaining) {
-					line.Append(Space(remaining));
-					lines.Add(line.ToString());
-					line.Clear().Append(word);
-					remaining = lineWidth - width;
-				}
-				else {
-					line.Append(word);
-					remaining -= width;
-				}
+				curWidth += charWidth;
 
-				if(remaining <= 1 || word.EndsWith("\n")) {
-					line.Append(Space(remaining));
-					lines.Add(line.ToString());
-					line.Clear();
-					remaining = lineWidth;
-				}
-				else {
-					remaining--;
-					line.Append(' ');
+				pos++;
+
+				// allow soft wraps after each full-width character
+				if(char.IsWhiteSpace(ch) || IsFullWidthCharacter(ch)) {
+					lastPossibleWrap = pos;
 				}
 			}
-			lines.Add(line.ToString().TrimEnd());
-			return string.Join("", lines);
+
+			// add the last line
+			if(pos > lastWrap) {
+				string line = source.Substring(lastWrap, pos - lastWrap);
+				if(line.Trim().Length > 0) {
+					lines.Add(line.PadRight(line.Length + (lineWidth - StringWidth(line, metrics)) / metrics.HalfWidthHorizontalSpacing));
+				}
+			}
+
+			return lines.ToArray();
 		}
 
 		public static string ReplaceSpecialChars(string source) {
@@ -118,6 +108,7 @@ namespace Yuka.Script {
 			sb.Replace('ー', '-');
 			sb.Replace('ｰ', '-');
 			sb.Replace('―', '-');
+			sb.Replace('’', '\'');
 
 			return sb.ToString();
 		}
@@ -126,6 +117,20 @@ namespace Yuka.Script {
 			string line = new string('=', (int)(width * progress)) + new string('.', width - (int)(width * progress));
 			string text = progress.ToString("p");
 			return line.Substring(0, (width - text.Length) / 2 - 1) + ' ' + text + ' ' + line.Substring((width + text.Length) / 2 + 2);
+		}
+
+		public struct FontMetrics {
+			public int FullWidthHorizontalSpacing, HalfWidthHorizontalSpacing, VerticalSpacing;
+
+			public int GetCharacterWidth(char ch) {
+				return IsFullWidthCharacter(ch) ? FullWidthHorizontalSpacing : HalfWidthHorizontalSpacing;
+			}
+
+			public FontMetrics(int horizontal, int vertical) {
+				FullWidthHorizontalSpacing = horizontal;
+				HalfWidthHorizontalSpacing = horizontal / 2;
+				VerticalSpacing = vertical;
+			}
 		}
 	}
 }

@@ -185,7 +185,13 @@ namespace Yuka.Script {
 
 
 
-									value = TextUtils.WrapWords(value, lineWidth);
+									var lines = TextUtils.WrapWords(value, lineWidth, new TextUtils.FontMetrics(24, 32));
+									value = string.Join("", lines);
+
+									Console.WriteLine("|--------------------------------------------------|");
+									foreach(var line in lines) {
+										Console.WriteLine('|' + line + '|');
+									}
 								}
 
 								//Console.WriteLine(entry[0] + ": " + value);
