@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Yuka.Data;
 
 namespace Yuka.Script {
 	abstract class DataElement {
@@ -127,10 +128,10 @@ namespace Yuka.Script {
 
 	class ExternalStringDataElement : DataElement {
 		public string id;
-		public Dictionary<string, string> stringTable;
+		public Dictionary<string, ScriptLine> stringTable;
 		int offset = -1;
 
-		public ExternalStringDataElement(string id, Dictionary<string, string> stringTable) : base(TYPE_CSTR) {
+		public ExternalStringDataElement(string id, Dictionary<string, ScriptLine> stringTable) : base(TYPE_CSTR) {
 			this.id = id;
 			this.stringTable = stringTable;
 		}
@@ -138,7 +139,7 @@ namespace Yuka.Script {
 		public override void WriteData(DataManager m) {
 			byte[] temp;
 			if(stringTable.ContainsKey(id) && !id.StartsWith("@")) {
-				temp = Encoding.GetEncoding("shift-jis").GetBytes(stringTable[id]);
+				temp = Encoding.GetEncoding("shift-jis").GetBytes(stringTable[id].Text);
 			}
 			else {
 				ConsoleColor color = Console.ForegroundColor;

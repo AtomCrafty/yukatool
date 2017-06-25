@@ -7,13 +7,16 @@ using Yuka.Data;
 
 namespace Yuka.Script {
 	class Decompiler {
+		public static char delim = ',';
+
 		int codeoffset, codecount, indexoffset, indexcount, dataoffset, datalength;
-		Dictionary<string, string> stringTable = new Dictionary<string, string>();
+		Dictionary<string, ScriptLine> stringTable = new Dictionary<string, ScriptLine>();
 		List<ScriptElement> commands = new List<ScriptElement>();
 		Dictionary<int, ScriptElement> substituteExpressions = new Dictionary<int, ScriptElement>();
 
 		int nameCount, lineCount, stringCount;
 		string speaker = "";
+		int fontID = 0;
 
 		/**
 		 * Decompiles a binary script from a stream.
@@ -111,7 +114,7 @@ namespace Yuka.Script {
 								// generate a new line number
 								string id = "L" + (++lineCount);
 								// add those to the list of known strings...
-								stringTable.Add(id, speaker + '|' + line);
+								stringTable.Add(id, new ScriptLine(fontID, speaker, line));
 								// ...and replace the string parameter with reference to the line number
 								parameters[j] = new DataScriptElement(new ExternalStringDataElement(id, stringTable));
 							}
@@ -129,7 +132,7 @@ namespace Yuka.Script {
 									// for each entry on our list of known strings... 
 									foreach(var entry in stringTable) {
 										// ...check if it is a name.
-										if(entry.Key[0] == 'N' && entry.Value.Equals(name)) {
+										if(entry.Key[0] == 'N' && entry.Value.Text.Equals(name)) {
 											// if it is, remember it's ID...
 											id = entry.Key;
 											// ...and stop searching.
@@ -141,7 +144,7 @@ namespace Yuka.Script {
 										// generate a new one...
 										id = "N" + (++nameCount);
 										// ...and add it - together with the name - to the list of known strings.
-										stringTable.Add(id, name);
+										stringTable.Add(id, new ScriptLine(-1, null, name));
 									}
 									// finally, replace the parameter by a reference to the name ID.
 									parameters[j] = new DataScriptElement(new ExternalStringDataElement(id, stringTable));
@@ -170,6 +173,12 @@ namespace Yuka.Script {
 						if(((FuncDataElement)cmd).name.Equals("PF")) {
 							// ...reset the current speaker.
 							speaker = "";
+						}
+
+						// if the function is called "FontSet" and the second parameter is an integer, then...
+						if(((FuncDataElement)cmd).name.Equals("FontSet") && parameters.Length >= 2 && parameters[1] is DataScriptElement dataElem && dataElem.elem is IntDataElement intElem) {
+							// ...keep track of the current font
+							fontID = intElem.data;
 						}
 
 						// save the current position in the code stream.
@@ -339,23 +348,10 @@ namespace Yuka.Script {
 					// otherwise...
 					else {
 						string id = null;
-						// ... go through all entries on our list of known strings.
-						/*foreach(var entry in stringTable) {
-							// check if it is a name.
-							if(entry.Key[0] == 'S' && entry.Value.Equals(str)) {
-								// if it is, remember it's ID...
-								id = entry.Key;
-								// ...and stop searching.
-								break;
-							}
-						}*/
-						// if you didn't find a matching ID, then...
-						//if(id == null) { // (keep duplicates, they may have different translations)
 						// ...generate a new one...
 						id = "S" + (++stringCount);
-						// ...and add it - together with the name - to the list of known strings.
-						stringTable.Add(id, str);
-						//}
+						// ...and add it to the list of known strings.
+						stringTable.Add(id, new ScriptLine(-1, null, str));
 						// then use an external string reference as the new expression.
 						parameters[i] = new DataScriptElement(new ExternalStringDataElement(id, stringTable));
 					}
@@ -537,7 +533,7 @@ namespace Yuka.Script {
 			// write string data
 			if(script.stringTable.Count > 0) {
 				StreamWriter w = new StreamWriter(new FileStream(stringPath, FileMode.Create));
-				w.WriteLine("ID,Speaker,Original,Translation,TLC,Edit,QC,Comments,Generated");
+				w.WriteLine($"ID{delim}Speaker{delim}Original{delim}Translation{delim}TLC{delim}Edit{delim}QC{delim}Comments{delim}Generated");
 				// write names
 				bool flag = false;
 				foreach(var entry in script.stringTable) {
@@ -546,7 +542,7 @@ namespace Yuka.Script {
 							w.WriteLine("\n#Names:");
 							flag = true;
 						}
-						w.WriteLine(entry.Key + ",," + entry.Value);
+						w.WriteLine(entry.Key + delim + delim + entry.Value.Text);
 					}
 				}
 				// write lines
@@ -558,18 +554,17 @@ namespace Yuka.Script {
 							flag = true;
 						}
 
-						string speaker = "";
-						string line = entry.Value;
+						string speaker = entry.Value.Speaker ?? "";
+						string line = entry.Value.Text;
+						int fontID = entry.Value.FontID;
 
-						int index = line.IndexOf('|');
-						if(index >= 0) {
-							speaker = line.Substring(0, index);
-							line = line.Substring(index + 1);
-						}
+						int fontSize = Constants.fontInfo[fontID].FullWidthHorizontalSpacing;
 
-						line = "\"" + line.Replace("\"", "\"\"") + "\"";
+						string meta = '"' + (speaker + (fontSize != TextUtils.defaultCharWidth ? $"\ncw:{fontSize}" : "")).Trim() + '"';
 
-						w.WriteLine(entry.Key + ',' + speaker + ',' + line);
+						line = '"' + line.Replace("\"", "\"\"") + '"';
+
+						w.WriteLine(entry.Key + delim + meta + delim + line);
 					}
 				}
 				w.Close();

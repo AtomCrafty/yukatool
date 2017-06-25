@@ -5,6 +5,7 @@ using System.Text;
 namespace Yuka.Script {
 	class TextUtils {
 		public static int defaultLineWidth = 600;
+		public static int defaultCharWidth = 24;
 
 		public static bool IsFullWidthCharacter(char ch) {
 			return ch >= 0x3000 && ch < 0x3040 // Japanese-style punctuation
@@ -119,11 +120,17 @@ namespace Yuka.Script {
 			return line.Substring(0, (width - text.Length) / 2 - 1) + ' ' + text + ' ' + line.Substring((width + text.Length) / 2 + 2);
 		}
 
-		public struct FontMetrics {
+		public class FontMetrics {
 			public int FullWidthHorizontalSpacing, HalfWidthHorizontalSpacing, VerticalSpacing;
 
 			public int GetCharacterWidth(char ch) {
 				return IsFullWidthCharacter(ch) ? FullWidthHorizontalSpacing : HalfWidthHorizontalSpacing;
+			}
+
+			public FontMetrics(int horizontal) {
+				FullWidthHorizontalSpacing = horizontal;
+				HalfWidthHorizontalSpacing = horizontal / 2;
+				VerticalSpacing = horizontal;
 			}
 
 			public FontMetrics(int horizontal, int vertical) {

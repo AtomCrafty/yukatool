@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Yuka.Script;
 
 namespace Yuka {
 	class Constants {
@@ -25,6 +26,21 @@ namespace Yuka {
 		public const string html = "html";
 
 		public static Dictionary<string, string> knownVars = new Dictionary<string, string>();
+
+		public static TextUtils.FontMetrics[] fontInfo = new[] {
+			new TextUtils.FontMetrics(24, 32),
+			new TextUtils.FontMetrics(24),
+			null,
+			new TextUtils.FontMetrics(10),
+			new TextUtils.FontMetrics(30),
+			new TextUtils.FontMetrics(36),
+			new TextUtils.FontMetrics(50),
+			new TextUtils.FontMetrics(20),
+			new TextUtils.FontMetrics(14),
+			new TextUtils.FontMetrics(22, 32),
+			new TextUtils.FontMetrics(24, 40),
+			null, null, null, null, null
+		};
 
 		static Constants() {
 			knownVars["flag_0"] = "flag_$";

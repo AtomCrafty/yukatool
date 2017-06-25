@@ -11,7 +11,7 @@ namespace Yuka.Script {
 		/// <summary>
 		/// The table of key - string associations
 		/// </summary>
-		Dictionary<string, string> stringTable = new Dictionary<string, string>();
+		Dictionary<string, ScriptLine> stringTable = new Dictionary<string, ScriptLine>();
 
 		/// <summary>
 		/// The table of jump label IDs and their target control element
@@ -111,48 +111,66 @@ namespace Yuka.Script {
 				int minTextColumn = 2;
 
 				int defaultLineWidth = TextUtils.defaultLineWidth;
+				int defaultCharWidth = TextUtils.defaultCharWidth;
 				bool removeQuotes = true;
+				bool correctPunctuation = true;
+				bool replaceSpecialChars = true;
 
 				foreach(List<string> entry in rows) {
+					if(entry.Count < 7) continue;
 					#region Handle row
-					int lineWidth = defaultLineWidth;
-					if(entry[0].Length > 0 && entry[0][0] == '!') {
-						entry[0] = entry[0].TrimStart('!');
-						if(entry.Count > 1) {
-							string[] metaData = entry[1].Split('\n');
-							string speaker = "";
-							foreach(string meta in metaData) {
-								string[] data = meta.Split(new[] { ':' }, 2);
-								if(data.Length == 2) {
-									switch(data[0].ToLower()) {
-										case "speaker":
-											speaker = data[1];
-											break;
-										case "w":
-										case "cpl":
-										case "width":
-											lineWidth = int.Parse(data[1]);
-											break;
-										case "dw":
-										case "dcpl":
-										case "dwidth":
-										case "defaultwidth":
-										case "defaultlinewidth":
-											defaultLineWidth = int.Parse(data[1]);
-											lineWidth = defaultLineWidth;
-											break;
-										case "rmq":
-										case "rmquotes":
-										case "removequotes":
-											removeQuotes = bool.Parse(data[1]);
-											break;
-									}
-								}
+
+					#region Read meta data
+					int currentLineWidth = defaultLineWidth;
+					int currentCharWidth = defaultCharWidth;
+
+					string[] metaData = entry[1].Split('\n');
+					string speaker = "";
+
+					foreach(string meta in metaData) {
+						string[] data = meta.Split(new[] { ':' }, 2);
+						if(data.Length == 2) {
+							switch(data[0].Trim().ToLower()) {
+								case "lw":
+								case "linewidth":
+									currentLineWidth = int.Parse(data[1].Trim());
+									break;
+								case "dlw":
+								case "defaultlinewidth":
+									defaultLineWidth = int.Parse(data[1].Trim());
+									currentLineWidth = defaultLineWidth;
+									break;
+								case "cw":
+								case "charwidth":
+									currentCharWidth = int.Parse(data[1].Trim());
+									break;
+								case "dcw":
+								case "defaultcharwidth":
+									defaultCharWidth = int.Parse(data[1].Trim());
+									currentCharWidth = defaultCharWidth;
+									break;
+								case "rmq":
+								case "rmquotes":
+								case "removequotes":
+									removeQuotes = bool.Parse(data[1].Trim());
+									break;
+								case "cp":
+								case "correctpunctiation":
+									correctPunctuation = bool.Parse(data[1].Trim());
+									break;
+								case "rsc":
+								case "replacespecialchars":
+									replaceSpecialChars = bool.Parse(data[1].Trim());
+									break;
 							}
-							entry[1] = speaker;
+						}
+						else {
+							speaker = meta;
 						}
 					}
+					#endregion
 
+					#region Format string
 					if(entry[0].Length > 0 && "LNS".Contains(entry[0][0].ToString())) {
 						/*if(entry.Count > metaColumnID && entry[metaColumnID].Trim().Length > 0) {
 							Console.WriteLine(entry[0] + ": " + entry[metaColumnID].Trim('\n'));
@@ -173,33 +191,50 @@ namespace Yuka.Script {
 										value = value.Substring(1, value.Length - 2);
 									}
 
-									// get rid of most japanese double width punctuation characters
-									value = TextUtils.ReplaceSpecialChars(value);
 
-									// replace 2 or more dots by exactly 3
-									value = Regex.Replace(value, @"…|[…\.]{2,}", "...");
-									// add a space after ellipses that don't already have one next to them
-									value = Regex.Replace(value, @"(?!^|[\s""])\.\.\.(?=\w)", "... ");
-
-
-
-
-
-									var lines = TextUtils.WrapWords(value, lineWidth, new TextUtils.FontMetrics(24, 32));
-									value = string.Join("", lines);
-
-									Console.WriteLine("|--------------------------------------------------|");
-									foreach(var line in lines) {
-										Console.WriteLine('|' + line + '|');
+									if(replaceSpecialChars) {
+										// get rid of most japanese double width punctuation characters
+										value = TextUtils.ReplaceSpecialChars(value);
 									}
+
+
+									if(correctPunctuation) {
+										// replace 2 or more dots by exactly 3
+										value = Regex.Replace(value, @"…|[…\.]{2,}", "...");
+										// add a space after ellipses that don't already have one next to them
+										value = Regex.Replace(value, @"(?!^|[\s""])\.\.\.(?=\w)", "... ");
+									}
+
+
+
+
+
+									var lines = TextUtils.WrapWords(value, currentLineWidth, new TextUtils.FontMetrics(currentCharWidth));
+									value = string.Join("", lines).Trim();
+
+									/*
+									Console.WriteLine();
+									Console.WriteLine($" line width: {currentLineWidth}px");
+									Console.WriteLine($" char width: {currentCharWidth}px / {currentCharWidth / 2}px");
+									Console.WriteLine(" speaker: " + (speaker.Length > 0 ? speaker : "none"));
+									Console.WriteLine(new string('-', currentLineWidth / currentCharWidth * 2));
+									Console.BackgroundColor = ConsoleColor.DarkBlue;
+									Console.ForegroundColor = ConsoleColor.Magenta;
+									foreach(var line in lines) {
+										Console.WriteLine(line);
+									}
+									Console.ResetColor();
+									//*/
 								}
 
 								//Console.WriteLine(entry[0] + ": " + value);
-								stringTable[entry[0]] = value;
+								stringTable[entry[0]].Text = value;
 								break;
 							}
 						}
 					}
+					#endregion
+
 					#endregion
 				}
 				#endregion
