@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Yuka.Data;
@@ -117,7 +118,7 @@ namespace Yuka.Script {
 				bool replaceSpecialChars = true;
 
 				foreach(List<string> entry in rows) {
-					if(entry.Count < 7) continue;
+					if(entry.Count < 3) continue;
 					#region Handle row
 
 					#region Read meta data
@@ -164,7 +165,7 @@ namespace Yuka.Script {
 									break;
 							}
 						}
-						else {
+						else if(entry[0].Length > 0 && "LNS".Contains(entry[0][0].ToString())) {
 							speaker = meta;
 						}
 					}
@@ -203,16 +204,16 @@ namespace Yuka.Script {
 										value = Regex.Replace(value, @"…|[…\.]{2,}", "...");
 										// add a space after ellipses that don't already have one next to them
 										value = Regex.Replace(value, @"(?!^|[\s""])\.\.\.(?=\w)", "... ");
+										// replace multuple spaces by a single one
+										value = Regex.Replace(value, @" {2,}", " ");
 									}
 
 
 
-
-
+									/*
 									var lines = TextUtils.WrapWords(value, currentLineWidth, new TextUtils.FontMetrics(currentCharWidth));
 									value = string.Join("", lines).Trim();
-
-									/*
+									
 									Console.WriteLine();
 									Console.WriteLine($" line width: {currentLineWidth}px");
 									Console.WriteLine($" char width: {currentCharWidth}px / {currentCharWidth / 2}px");
@@ -225,10 +226,11 @@ namespace Yuka.Script {
 									}
 									Console.ResetColor();
 									//*/
+									value = string.Join(" ", value.Split(' ').Select(word => $"@m({word.Length + 1}){word}"));
 								}
 
 								//Console.WriteLine(entry[0] + ": " + value);
-								stringTable[entry[0]].Text = value;
+								stringTable[entry[0]] = new ScriptLine(currentCharWidth, speaker, value);
 								break;
 							}
 						}

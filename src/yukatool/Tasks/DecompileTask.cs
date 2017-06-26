@@ -13,6 +13,7 @@ namespace Yuka.Tasks {
 		public override void DefaultFlags(FlagCollection flags) {
 			flags.Add('v', "verbose", "Outputs additional information", false);
 			flags.Add('w', "wait", "Waits for enter before closing the console", false);
+			flags.Add('e', "excel", "Uses ; instead of , as csv delimiter", false);
 		}
 
 		protected override void Execute() {
@@ -31,6 +32,11 @@ namespace Yuka.Tasks {
 			}
 			else {
 				Fail("The specified source file does not exist");
+			}
+
+			if(flags.Has('e')) {
+				Decompiler.CSVDelimiter = ';';
+				Console.WriteLine("Switching to Excel compatibility mode");
 			}
 
 			for(int i = 0; i < files.Length; i++) {

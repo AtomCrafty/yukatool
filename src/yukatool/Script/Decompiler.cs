@@ -7,7 +7,7 @@ using Yuka.Data;
 
 namespace Yuka.Script {
 	class Decompiler {
-		public static char delim = ',';
+		public static char CSVDelimiter = ',';
 
 		int codeoffset, codecount, indexoffset, indexcount, dataoffset, datalength;
 		Dictionary<string, ScriptLine> stringTable = new Dictionary<string, ScriptLine>();
@@ -533,16 +533,16 @@ namespace Yuka.Script {
 			// write string data
 			if(script.stringTable.Count > 0) {
 				StreamWriter w = new StreamWriter(new FileStream(stringPath, FileMode.Create));
-				w.WriteLine($"ID{delim}Speaker{delim}Original{delim}Translation{delim}TLC{delim}Edit{delim}QC{delim}Comments{delim}Generated");
+				w.WriteLine($"ID{CSVDelimiter}Speaker{CSVDelimiter}Original{CSVDelimiter}Translation{CSVDelimiter}TLC{CSVDelimiter}Edit{CSVDelimiter}QC{CSVDelimiter}Comments{CSVDelimiter}Generated");
 				// write names
 				bool flag = false;
 				foreach(var entry in script.stringTable) {
 					if(entry.Key.StartsWith("N")) {
 						if(!flag) {
-							w.WriteLine("\n#Names:");
+							w.WriteLine(CSVDelimiter + "\r\n#Names:");
 							flag = true;
 						}
-						w.WriteLine(entry.Key + delim + delim + entry.Value.Text);
+						w.WriteLine(entry.Key + CSVDelimiter + CSVDelimiter + entry.Value.Text);
 					}
 				}
 				// write lines
@@ -550,7 +550,7 @@ namespace Yuka.Script {
 				foreach(var entry in script.stringTable) {
 					if(!entry.Key.StartsWith("N")) {
 						if(!flag) {
-							w.WriteLine("\n#Lines:");
+							w.WriteLine(CSVDelimiter + "\r\n#Lines:");
 							flag = true;
 						}
 
@@ -558,13 +558,13 @@ namespace Yuka.Script {
 						string line = entry.Value.Text;
 						int fontID = entry.Value.FontID;
 
-						int fontSize = Constants.fontInfo[fontID].FullWidthHorizontalSpacing;
+						int fontSize = fontID >= 0 && fontID < 16 ? Constants.fontInfo[fontID].FullWidthHorizontalSpacing : TextUtils.defaultCharWidth;
 
 						string meta = '"' + (speaker + (fontSize != TextUtils.defaultCharWidth ? $"\ncw:{fontSize}" : "")).Trim() + '"';
 
 						line = '"' + line.Replace("\"", "\"\"") + '"';
 
-						w.WriteLine(entry.Key + delim + meta + delim + line);
+						w.WriteLine(entry.Key + CSVDelimiter + meta + CSVDelimiter + line);
 					}
 				}
 				w.Close();

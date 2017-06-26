@@ -15,6 +15,7 @@ namespace Yuka.Tasks {
 			flags.Add('w', "wait", "Waits for enter before closing the console", false);
 			flags.Add('p', "progress", "Display a progress bar", false);
 			flags.Add('r', "raw", "Disables auto-conversion of binary files", false);
+			flags.Add('e', "excel", "Uses ; instead of , as csv delimiter", false);
 		}
 
 		protected override void Execute() {
@@ -27,6 +28,11 @@ namespace Yuka.Tasks {
 
 			if(!File.Exists(sourceBasePath)) {
 				Fail("The specified source file does not exist");
+			}
+
+			if(flags.Has('e')) {
+				Decompiler.CSVDelimiter = ';';
+				Console.WriteLine("Switching to Excel compatibility mode");
 			}
 
 			// read archive

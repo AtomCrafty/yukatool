@@ -33,7 +33,15 @@ namespace Yuka.Script {
 				char ch = source[pos];
 				int charWidth = metrics.GetCharacterWidth(ch);
 
-				if(curWidth + charWidth > lineWidth) {
+				if(ch == '\n') {
+					// wrap here
+					string line = source.Substring(lastWrap, pos - lastWrap);
+					lastWrap = lastPossibleWrap = pos;
+					curWidth = 0;
+
+					lines.Add(line.PadRight(line.Length + (lineWidth - StringWidth(line, metrics)) / metrics.HalfWidthHorizontalSpacing));
+				}
+				else if(curWidth + charWidth > lineWidth) {
 					if(lastPossibleWrap > lastWrap) {
 						// check length of current word
 						int end = pos;
