@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using Yuka.Data;
 
 namespace Yuka.Script {
@@ -116,6 +115,7 @@ namespace Yuka.Script {
 				bool removeQuotes = true;
 				bool correctPunctuation = true;
 				bool replaceSpecialChars = true;
+				bool wrapWords = true;
 
 				foreach(List<string> entry in rows) {
 					if(entry.Count < 3) continue;
@@ -200,14 +200,8 @@ namespace Yuka.Script {
 
 
 									if(correctPunctuation) {
-										// replace 2 or more dots by exactly 3
-										value = Regex.Replace(value, @"…|[…\.]{2,}", "...");
-										// add a space after ellipses that don't already have one next to them
-										value = Regex.Replace(value, @"(?!^|[\s""])\.\.\.(?=\w)", "... ");
-										// replace multuple spaces by a single one
-										value = Regex.Replace(value, @" {2,}", " ");
+										value = TextUtils.CorrectPunctuation(value);
 									}
-
 
 
 									/*
@@ -226,7 +220,20 @@ namespace Yuka.Script {
 									}
 									Console.ResetColor();
 									//*/
-									value = string.Join(" ", value.Split(' ').Select(word => $"@m({word.Length + 1}){word}"));
+
+									if(wrapWords) {
+										value = string.Join(
+											"@m(1000)",
+											value.Split('\n').Select(
+												line => string.Join(
+													" ",
+													line.Split(' ').Select(
+														word => $"@m({word.Length + 2}){word}"
+													)
+												)
+											)
+										);
+									}
 								}
 
 								//Console.WriteLine(entry[0] + ": " + value);

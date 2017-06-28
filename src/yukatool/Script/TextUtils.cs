@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Yuka.Script {
 	class TextUtils {
@@ -98,7 +99,7 @@ namespace Yuka.Script {
 			StringBuilder sb = new StringBuilder(source);
 
 			// use ─ for seamless lines
-			// don't use these note characters: ♩♫♬🎝🎵
+			// supported special characters: ★☆♀♂♪♭♯
 
 			sb.Replace('（', '(');
 			sb.Replace('）', ')');
@@ -108,6 +109,7 @@ namespace Yuka.Script {
 			sb.Replace("」", "");
 			sb.Replace("、", ", ");
 			sb.Replace("。", ". ");
+			sb.Replace("…", "...");
 			sb.Replace('！', '!');
 			sb.Replace('？', '?');
 			sb.Replace('~', '～');
@@ -120,6 +122,33 @@ namespace Yuka.Script {
 			sb.Replace('’', '\'');
 
 			return sb.ToString();
+		}
+
+		public static string CorrectPunctuation(string value) {
+			// replace 2 or more dots by exactly 3
+			value = Regex.Replace(value, @"…|[…\.]{2,}", "...");
+			// remove redundant exclamation points
+			value = Regex.Replace(value, @"!{2,}", "!");
+			// remove redundant question marks
+			value = Regex.Replace(value, @"\?{2,}", "?");
+			// remove redundant commas
+			value = Regex.Replace(value, @",{2,}", ",");
+			// ensure incorrect interrobang order (-.-)
+			value = Regex.Replace(value, @"\?!", "!?");
+			// add a space after ellipses that are surrounded by letters
+			value = Regex.Replace(value, @"(?<=\w)\.\.\.(?=\w)", "... ");
+			// replace multiple dashes by "em" dash
+			value = Regex.Replace(value, @"-{2,}", "─");
+			// add a space after comma
+			value = Regex.Replace(value, @",(?=\w)", ", ");
+			// remove space before and add space after semicolon
+			value = Regex.Replace(value, @"\s*;\s*", "; ");
+			// add a full stop at the end, if missing
+			value = Regex.Replace(value, @"(?=\w)$", ".");
+			// remove redundant spaces
+			value = Regex.Replace(value, @"\s{2,}", " ");
+			value = value.Trim();
+			return value;
 		}
 
 		public static string ProgressBar(int width, double progress) {
