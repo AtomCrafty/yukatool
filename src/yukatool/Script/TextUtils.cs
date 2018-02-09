@@ -114,12 +114,13 @@ namespace Yuka.Script {
 			sb.Replace('？', '?');
 			sb.Replace('~', '～');
 			sb.Replace('⁓', '～');
-			sb.Replace('–', '-');
-			sb.Replace('—', '-');
-			sb.Replace('ー', '-');
-			sb.Replace('ｰ', '-');
-			sb.Replace('―', '-');
-			sb.Replace('’', '\'');
+			sb.Replace('–', '—');
+			sb.Replace('—', '—');
+			sb.Replace('ー', '—');
+			sb.Replace('ｰ', '—');
+			sb.Replace('―', '—');
+            sb.Replace('─', '—');
+            sb.Replace('’', '\'');
 
 			return sb.ToString();
 		}
@@ -138,7 +139,7 @@ namespace Yuka.Script {
 			// add a space after ellipses that are surrounded by letters
 			value = Regex.Replace(value, @"(?<=\w)\.\.\.(?=\w)", "... ");
 			// replace multiple dashes by "em" dash
-			value = Regex.Replace(value, @"-{2,}", "─");
+			value = Regex.Replace(value, @"-{2,}", "—");
 			// add a space after comma
 			value = Regex.Replace(value, @",(?=\w)", ", ");
 			// remove space before and add space after semicolon
@@ -175,6 +176,27 @@ namespace Yuka.Script {
 				HalfWidthHorizontalSpacing = horizontal / 2;
 				VerticalSpacing = vertical;
 			}
+		}
+
+		private static readonly Encoding AsciiEncoding = Encoding.GetEncoding(
+			"ASCII",
+			EncoderFallback.ExceptionFallback,
+			DecoderFallback.ExceptionFallback);
+		
+		public static string EncodeYukaString(string str) {
+			var result = new StringBuilder(str.Length);
+			var buffer = new byte[2];
+
+			for(int i = 0; i < str.Length; i++) {
+				try {
+					AsciiEncoding.GetBytes(str, i, 1, buffer, 0);
+					result.Append(str[i]);
+				}
+				catch {
+					result.Append($"@u({(int)str[i]:X4})");
+				}
+			}
+			return result.ToString();
 		}
 	}
 }

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Yuka;
 using Yuka.Data;
+using Yuka.Script;
 
 namespace Yuka.Script {
 	abstract class DataElement {
@@ -111,6 +113,7 @@ namespace Yuka.Script {
 
 		public override void WriteData(DataManager m) {
 			byte[] temp = Encoding.GetEncoding("shift-jis").GetBytes(data);
+			//byte[] temp = Encoding.ASCII.GetBytes(data);
 			// add terminating zero byte
 			byte[] zero = new byte[temp.Length + 1];
 			Array.Copy(temp, zero, temp.Length);

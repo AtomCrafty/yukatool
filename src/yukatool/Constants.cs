@@ -119,11 +119,13 @@ namespace Yuka {
 
 			knownVars["flag_2000"] = "button_row_1_col_1";
 			knownVars["flag_2001"] = "button_row_1_col_2";
+			knownVars["flag_2002"] = "button_row_1_col_3";
 			knownVars["flag_2010"] = "button_row_2_col_1";
 			knownVars["flag_2011"] = "button_row_2_col_2";
 			knownVars["flag_2012"] = "button_row_2_col_3";
 			knownVars["flag_2020"] = "button_row_3_col_1";
 			knownVars["flag_2021"] = "button_row_3_col_2";
+			knownVars["flag_2022"] = "button_row_3_col_3";
 			knownVars["flag_2030"] = "button_row_4_col_1";
 			knownVars["flag_2031"] = "button_row_4_col_2";
 			knownVars["flag_2032"] = "button_row_4_col_3";

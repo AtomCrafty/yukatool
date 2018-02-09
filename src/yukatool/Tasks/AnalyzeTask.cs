@@ -155,7 +155,7 @@ namespace Yuka.Tasks {
 							Echo("# ", "comment", w);
 							Echo(report.DataLength.ToString(), "\n", "const const-int", w);
 
-							Echo("Ver Pool Size:		", w);
+							Echo("Var Pool Size:		", w);
 							Echo(report.VarPoolSize.ToString("X8"), "          ", "const const-int", w);
 							Echo("# ", "comment", w);
 							Echo(report.VarPoolSize.ToString(), "\n", "const const-int", w);
@@ -220,7 +220,7 @@ namespace Yuka.Tasks {
 													Echo(":" + Helpers.ToZeroTerminatedString(data, arg.Field1), "src src-lbl", w);
 													break;
 												case AnalyzerReport.ScriptBinary.IndexEntry.EntryType.YKS_CINT:
-													Echo(arg.ID.ToString(), "src src-int", w);
+													Echo(BitConverter.ToInt32(data, arg.Field2).ToString(), "src src-int", w);
 													break;
 												case AnalyzerReport.ScriptBinary.IndexEntry.EntryType.YKS_CSTR:
 													Echo('"' + Helpers.ToZeroTerminatedString(data, arg.Field2) + '"', "src src-str", w);

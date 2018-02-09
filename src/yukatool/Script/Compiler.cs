@@ -23,6 +23,8 @@ namespace Yuka.Script {
 		/// </summary>
 		int tempVarID = 0;
 
+		private string scriptname;
+
 		/// <summary>
 		/// Parses an entire script (.ykd) with optional attached metadata (.csv)
 		/// </summary>
@@ -30,6 +32,8 @@ namespace Yuka.Script {
 		/// <param name="stringPath">Absolute path of the meta attachment (.csv)</param>
 		/// <returns>The parsed script</returns>
 		public YukaScript FromSource(string scriptPath, string stringPath) {
+
+			scriptname = Path.GetFileNameWithoutExtension(scriptPath);
 
 			#region Import meta information
 			if(File.Exists(stringPath)) {
@@ -163,6 +167,10 @@ namespace Yuka.Script {
 								case "replacespecialchars":
 									replaceSpecialChars = bool.Parse(data[1].Trim());
 									break;
+								case "ww":
+								case "wordwrap":
+									wrapWords = bool.Parse(data[1].Trim());
+									break;
 							}
 						}
 						else if(entry[0].Length > 0 && "LNS".Contains(entry[0][0].ToString())) {
@@ -203,6 +211,8 @@ namespace Yuka.Script {
 										value = TextUtils.CorrectPunctuation(value);
 									}
 
+									value = TextUtils.EncodeYukaString(value);
+
 
 									/*
 									var lines = TextUtils.WrapWords(value, currentLineWidth, new TextUtils.FontMetrics(currentCharWidth));
@@ -228,7 +238,7 @@ namespace Yuka.Script {
 												line => string.Join(
 													" ",
 													line.Split(' ').Select(
-														word => $"@m({word.Length + 2}){word}"
+														word => $"@m({word.Length + 1}){word}"
 													)
 												)
 											)
@@ -280,10 +290,11 @@ namespace Yuka.Script {
 			if(br.BaseStream.Position == br.BaseStream.Length) return null;
 
 			ScriptElement elem = NextValue(br);
+			Debug.Assert(elem != null, $"Null data element in script '{scriptname}'");
 			SkipWhitespace(br);
 
-			if(elem is DataScriptElement && (elem as DataScriptElement).elem is ControlDataElement) {
-				return new JumpLabelScriptElement(((elem as DataScriptElement).elem as ControlDataElement).name);
+			if((elem as DataScriptElement)?.elem is ControlDataElement cde) {
+				return new JumpLabelScriptElement(cde.name);
 			}
 
 			switch(br.PeekChar()) {
@@ -478,15 +489,13 @@ namespace Yuka.Script {
 								int id = int.Parse(name.Substring(10));
 								return new DataScriptElement(new VarStringRefDataElement("GlobalString", id));
 							}
+							throw new Exception("Unrecognized variable name: $" + name);
 						}
 						#endregion
 						#region Function call
 						else {
 							// read method call
 							ch = br.ReadChar();
-							if(!(ch == '(')) {
-
-							}
 							List<ScriptElement> param = new List<ScriptElement>();
 							if(br.PeekChar() != ')') {
 								do {
@@ -560,10 +569,10 @@ namespace Yuka.Script {
 					Console.ForegroundColor = ConsoleColor.Cyan;
 				}
 				foreach(ScriptElement cmd in cmds) {
-					if(cmd is DataScriptElement && (cmd as DataScriptElement).elem is ControlDataElement) {
-						string name = ((cmd as DataScriptElement).elem as ControlDataElement).name;
+					if(cmd is DataScriptElement dse && dse.elem is ControlDataElement cde) {
+						string name = cde.name;
 						if(!"else".Equals(name) && !"{".Equals(name) && !"}".Equals(name)) {
-							jumpLabels.Add(name, (cmd as DataScriptElement).elem as ControlDataElement);
+							jumpLabels.Add(name, cde);
 						}
 					}
 					//Console.WriteLine(cmd);
