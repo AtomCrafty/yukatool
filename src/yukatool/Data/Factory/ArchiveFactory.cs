@@ -6,6 +6,7 @@ using System.Text;
 namespace Yuka.Data.Factory {
 	class ArchiveFactory : FileFactory<YukaArchive> {
 		public static readonly ArchiveFactory Instance = new ArchiveFactory();
+		private static readonly Encoding ShiftJis = Encoding.GetEncoding("Shift-JIS");
 
 		public ArchiveFactory() : base(DataType.Archive) { }
 
@@ -28,7 +29,7 @@ namespace Yuka.Data.Factory {
 				uint datalength = br.ReadUInt32();
 
 				s.Seek(nameoffset, SeekOrigin.Begin);
-				string name = Encoding.ASCII.GetString(br.ReadBytes((int)namelength - 1)).ToLower();
+				string name = ShiftJis.GetString(br.ReadBytes((int)namelength - 1)).ToLower();
 				s.Seek(dataoffset, SeekOrigin.Begin);
 				byte[] data = br.ReadBytes((int)datalength);
 
@@ -59,13 +60,14 @@ namespace Yuka.Data.Factory {
 				MemoryStream ms = data.GetInputStream(file.Key);
 				ms.CopyTo(s);
 				//s.Write(data, 0, data.Length);
-				offsets[file.Key] = (new uint[] { dataoffset, (uint)file.Value.Length, 0, (uint)file.Key.Length + 1 });
+				offsets[file.Key] = (new uint[] { dataoffset, (uint)file.Value.Length, 0, (uint)ShiftJis.GetByteCount(file.Key) + 1 });
 			}
 
 			// Write name table
 			foreach(var entry in offsets) {
 				uint nameoffset = (uint)s.Position;
-				s.Write(Encoding.ASCII.GetBytes(entry.Key), 0, Encoding.ASCII.GetByteCount(entry.Key));
+				var bytes = ShiftJis.GetBytes(entry.Key);
+				s.Write(bytes, 0, bytes.Length);
 				s.WriteByte(0);
 				entry.Value[2] = nameoffset;
 			}
